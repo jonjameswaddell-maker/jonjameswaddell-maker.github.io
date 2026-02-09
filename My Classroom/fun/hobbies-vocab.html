@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hobbies Vocabulary Masterclass</title>
+    <style>
+        :root {
+            --primary: #4f46e5; /* Indigo */
+            --primary-dark: #4338ca;
+            --secondary: #10B981; /* Emerald */
+            --accent: #F59E0B; /* Amber */
+            --bg: #F3F4F6; /* Slate 50 */
+            --text: #1F2937; /* Slate 800 */
+            --card-bg: #ffffff;
+            --danger: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; }
+        h2 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .subtitle { opacity: 0.9; font-weight: 300; margin-top: 0.5rem; }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Vocab List --- */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        .vocab-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .vocab-table th { text-align: left; background: #f1f5f9; padding: 1rem; color: var(--primary); }
+        .vocab-table td { border-bottom: 1px solid #e2e8f0; padding: 1rem; vertical-align: top; }
+        .vocab-table tr:hover { background: #f8fafc; }
+        .cz-word { font-weight: bold; color: var(--secondary); }
+        .ex-sentence { font-style: italic; color: #64748b; font-size: 0.9rem; margin-top: 0.25rem; display: block; }
+
+        /* --- Utilities --- */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-check { background: var(--secondary); width: 100%; }
+        .feedback { margin-top: 1rem; padding: 1rem; border-radius: 0.5rem; display: none; font-weight: bold; text-align: center; }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        /* --- Image Match --- */
+        .img-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .img-card {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+        .img-card img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        select, .type-input {
+            padding: 0.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.3rem;
+            font-size: 1rem;
+            background: white;
+            width: 100%;
+        }
+        .type-input { margin-top: 0.5rem; }
+        select.correct { border-color: var(--secondary); background: #ecfdf5; color: var(--secondary); font-weight: bold; }
+        select.incorrect { border-color: var(--danger); background: #fef2f2; }
+
+        /* --- Match Game --- */
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .match-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .match-card {
+            background: white; border: 2px solid #e2e8f0; padding: 1rem;
+            text-align: center; cursor: pointer; border-radius: 0.5rem; transition: all 0.2s; user-select: none;
+        }
+        .match-card.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .match-card.matched { background: #dcfce7; color: var(--secondary); border-color: var(--secondary); opacity: 0.6; pointer-events: none; }
+
+        /* --- Gap Fill --- */
+        .fill-item { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 4px solid var(--primary); }
+
+        /* --- Spin Wheel --- */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 10px solid #e2e8f0;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: conic-gradient(
+                #ef4444 0deg 60deg,
+                #f59e0b 60deg 120deg,
+                #10b981 120deg 180deg,
+                #3b82f6 180deg 240deg,
+                #8b5cf6 240deg 300deg,
+                #ec4899 300deg 360deg
+            );
+        }
+        .wheel-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 2;
+        }
+        .wheel-pointer {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
+            border-top: 30px solid var(--text); z-index: 3;
+        }
+        .wheel-result {
+            text-align: center; margin-top: 1.5rem; padding: 1rem; background: #fffbeb;
+            border: 2px solid #fcd34d; border-radius: 0.5rem; min-height: 100px;
+        }
+        .big-word { font-size: 1.5rem; font-weight: bold; color: var(--primary); display: block; margin-bottom: 0.5rem; }
+
+
+        @media (max-width: 600px) {
+            .match-grid { grid-template-columns: 1fr; }
+            .vocab-table th:nth-child(3), .vocab-table td:nth-child(3) { display: none; }
+            .img-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Hobbies & Free Time</h1>
+        <div class="subtitle">Sports, Creativity, Music & Tech</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. Vocabulary List -->
+    <section>
+        <h2>📚 Vocabulary List</h2>
+        <div class="category-tabs">
+            <button class="tab-btn active" id="tab-active" onclick="filterVocab('active')">Active</button>
+            <button class="tab-btn" id="tab-creative" onclick="filterVocab('creative')">Creative</button>
+            <button class="tab-btn" id="tab-tech" onclick="filterVocab('tech')">Tech/Music</button>
+            <button class="tab-btn" id="tab-verbs" onclick="filterVocab('verbs')">Verbs</button>
+            <button class="tab-btn" id="tab-general" onclick="filterVocab('general')">General</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="vocab-table">
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>Czech</th>
+                        <th>Definition / Example</th>
+                    </tr>
+                </thead>
+                <tbody id="vocab-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 2. Visual Match -->
+    <section>
+        <h2>🖼️ Drill 1: Picture Match</h2>
+        <p>Look at the photos and choose the correct hobby.</p>
+        <div class="img-grid">
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=400&q=80" alt="Hobby 1">
+                <select class="img-select" data-ans="hiking">
+                    <option value="">Select...</option>
+                    <option value="cycling">Cycling</option>
+                    <option value="hiking">Hiking</option>
+                    <option value="traveling">Traveling</option>
+                </select>
+            </div>
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=400&q=80" alt="Hobby 2">
+                <select class="img-select" data-ans="photography">
+                    <option value="">Select...</option>
+                    <option value="filming">Filming</option>
+                    <option value="sightseeing">Sightseeing</option>
+                    <option value="photography">Photography</option>
+                </select>
+            </div>
+            <!-- Removed Knitting Image as requested -->
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?auto=format&fit=crop&w=400&q=80" alt="Hobby 4">
+                <select class="img-select" data-ans="cooking">
+                    <option value="">Select...</option>
+                    <option value="cooking">Cooking</option>
+                    <option value="gardening">Gardening</option>
+                    <option value="pottery">Pottery</option>
+                </select>
+            </div>
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=400&q=80" alt="Hobby 5">
+                <select class="img-select" data-ans="video games">
+                    <option value="">Select...</option>
+                    <option value="coding">Coding</option>
+                    <option value="video games">Video games</option>
+                    <option value="streaming">Streaming</option>
+                </select>
+            </div>
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1541625602330-2277a4c46182?auto=format&fit=crop&w=400&q=80" alt="Hobby 6">
+                <select class="img-select" data-ans="cycling">
+                    <option value="">Select...</option>
+                    <option value="cycling">Cycling</option>
+                    <option value="weightlifting">Weightlifting</option>
+                    <option value="gymnastics">Gymnastics</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-check" onclick="checkImages()">Check Answers</button>
+        <div id="img-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 3. Match Up Game -->
+    <section>
+        <h2>🧩 Drill 2: Meaning Match</h2>
+        <p>Match the English word to the Czech translation.</p>
+        <div class="match-grid">
+            <div class="match-col" id="col-eng"></div>
+            <div class="match-col" id="col-cz"></div>
+        </div>
+        <div id="match-feedback" class="feedback"></div>
+        <button class="btn btn-reset" style="background:transparent; color:#666; font-size:0.9rem; text-decoration:underline; margin-top:0;" onclick="initMatchGame()">Reset Game</button>
+    </section>
+
+    <!-- 4. Gap Fill -->
+    <section>
+        <h2>✍️ Drill 3: Complete the Sentence</h2>
+        <p>Select the correct word to complete the sentences.</p>
+        <div id="gap-container"></div>
+        <button class="btn btn-check" onclick="checkGapFill()">Check Answers</button>
+        <div id="gap-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 5. Typing Task -->
+    <section>
+        <h2>⌨️ Drill 4: Speed Typing</h2>
+        <p>Type the correct English word based on the clue.</p>
+        
+        <div class="fill-item">
+            <span style="color:var(--primary); font-weight:bold;">Def:</span> Sports like karate or judo.<br>
+            <input type="text" class="type-input" data-ans="martial arts" placeholder="Type here...">
+        </div>
+        
+        <div class="fill-item">
+            <span style="color:var(--secondary); font-weight:bold;">Cz:</span> Zahradničení<br>
+            <input type="text" class="type-input" data-ans="gardening" placeholder="Type here...">
+        </div>
+        
+        <div class="fill-item">
+             <span style="color:var(--primary); font-weight:bold;">Def:</span> Writing computer code.<br>
+            <input type="text" class="type-input" data-ans="coding" placeholder="Type here...">
+        </div>
+
+        <div class="fill-item">
+             <span style="color:var(--secondary); font-weight:bold;">Cz:</span> Cestování<br>
+            <input type="text" class="type-input" data-ans="traveling" placeholder="Type here...">
+        </div>
+
+        <button class="btn btn-check" onclick="checkTyping()">Check Spelling</button>
+        <div id="type-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 6. Spin Wheel -->
+    <section>
+        <h2>🎰 Drill 5: Spin the Wheel</h2>
+        <p>Spin the wheel. Use the word you get in a perfect sentence!</p>
+        
+        <div style="position: relative; margin: 2rem 0;">
+            <div class="wheel-pointer"></div>
+            <div class="wheel-container" id="wheel"></div>
+            <div class="wheel-center" onclick="spinWheel()" style="cursor:pointer;">SPIN</div>
+        </div>
+
+        <div class="wheel-result" id="wheel-output">
+            Press SPIN to start!
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // --- DATA ---
+    const vocabData = [
+        // Active / Sports
+        { cat: 'active', word: 'Martial arts', cz: 'Bojová umění', def: 'Sports like karate/judo.', ex: 'He has practiced martial arts since age six.' },
+        { cat: 'active', word: 'Hiking', cz: 'Pěší turistika', def: 'Walking long distances in nature.', ex: 'We love going hiking in the mountains.' },
+        { cat: 'active', word: 'Gymnastics', cz: 'Gymnastika', def: 'Physical exercises for flexibility.', ex: 'You need to be flexible for gymnastics.' },
+        { cat: 'active', word: 'Cycling', cz: 'Cyklistika', def: 'Riding a bicycle.', ex: 'Cycling to work keeps you fit.' },
+        { cat: 'active', word: 'Yoga', cz: 'Jóga', def: 'Exercises for physical/mental health.', ex: 'My roommate does yoga to relax.' },
+        { cat: 'active', word: 'Weightlifting', cz: 'Vzpírání', def: 'Lifting heavy weights.', ex: 'He is into weightlifting at the gym.' },
+
+        // Creative
+        { cat: 'creative', word: 'Photography', cz: 'Fotografie', def: 'Taking artistic photos.', ex: 'She is really good at photography.' },
+        { cat: 'creative', word: 'Woodworking', cz: 'Práce se dřevem', def: 'Building things from wood.', ex: 'My dad does woodworking and built a table.' },
+        { cat: 'creative', word: 'Knitting', cz: 'Pletení', def: 'Making clothes from wool.', ex: 'My grandma is knitting me a scarf.' },
+        { cat: 'creative', word: 'Pottery', cz: 'Hrnčířství', def: 'Making clay pots.', ex: 'We tried pottery but my vase looked like a blob.' },
+        { cat: 'creative', word: 'Drawing', cz: 'Kreslení', def: 'Creating pictures with pencil.', ex: 'He carries a sketchbook for drawing.' },
+        { cat: 'creative', word: 'Cooking', cz: 'Vaření', def: 'Preparing food.', ex: 'Cooking is great if you like eating well.' },
+        { cat: 'creative', word: 'Gardening', cz: 'Zahradničení', def: 'Growing plants.', ex: 'Gardening requires patience.' },
+        { cat: 'creative', word: 'DIY', cz: 'Kutilství', def: 'Do It Yourself.', ex: 'He is big into DIY and fixed his porch.' },
+
+        // Tech, Games & Music
+        { cat: 'tech', word: 'Board games', cz: 'Stolní hry', def: 'Games like Chess or Monopoly.', ex: 'We play board games when it rains.' },
+        { cat: 'tech', word: 'Video games', cz: 'Videohry', def: 'Electronic games.', ex: 'Most friends play video games on Fridays.' },
+        { cat: 'tech', word: 'Coding', cz: 'Programování', def: 'Writing computer code.', ex: 'He is learning coding to build an app.' },
+        { cat: 'tech', word: 'Blogging', cz: 'Blogování', def: 'Writing online journals.', ex: 'She started blogging about travel.' },
+        { cat: 'tech', word: 'Streaming', cz: 'Streamování', def: 'Broadcasting live video.', ex: 'He streams games on Twitch.' },
+        { cat: 'tech', word: 'Busking', cz: 'Pouliční umění', def: 'Playing music in public for money.', ex: 'He used to do busking as a student.' },
+        { cat: 'tech', word: 'Choir', cz: 'Sbor', def: 'Group singing.', ex: 'My sister sings in the choir.' },
+        { cat: 'tech', word: 'Instruments', cz: 'Nástroje', def: 'Objects like guitar/piano.', ex: 'How many instruments do you play?' },
+        { cat: 'tech', word: 'Songwriting', cz: 'Skládání písní', def: 'Writing music/lyrics.', ex: 'He spends time on songwriting.' },
+
+        // Verbs
+        { cat: 'verbs', word: 'To take up', cz: 'Začít s (hobbym)', def: 'Start a new hobby.', ex: 'I am thinking about taking up photography.' },
+        { cat: 'verbs', word: 'To give up', cz: 'Přestat s', def: 'Stop doing something.', ex: 'I gave up football due to injury.' },
+        { cat: 'verbs', word: 'To join', cz: 'Přidat se', def: 'Become a member.', ex: 'You should join the chess club.' },
+        { cat: 'verbs', word: 'To practice', cz: 'Trénovat', def: 'Do repeatedly to improve.', ex: 'Practice guitar every day.' },
+        { cat: 'verbs', word: 'To participate', cz: 'Účastnit se', def: 'Take part in.', ex: 'Do you want to participate in the run?' },
+        { cat: 'verbs', word: 'To collect', cz: 'Sbírat', def: 'Find and keep items.', ex: 'I used to collect Pokémon cards.' },
+        { cat: 'verbs', word: 'To compete', cz: 'Soutěžit', def: 'Try to win.', ex: 'We will compete in the finals.' },
+        { cat: 'verbs', word: 'To unwind', cz: 'Uvolnit se', def: 'Relax after stress.', ex: 'Fishing helps me unwind.' },
+
+        // General / Other
+        { cat: 'general', word: 'Volunteering', cz: 'Dobrovolnictví', def: 'Working for free.', ex: 'I do volunteering at the shelter.' },
+        { cat: 'general', word: 'Traveling', cz: 'Cestování', def: 'Going to other places.', ex: 'Traveling is expensive but worth it.' },
+        { cat: 'general', word: 'Reading', cz: 'Čtení', def: 'Looking at books.', ex: 'I am reading a sci-fi novel.' },
+        { cat: 'general', word: 'Sightseeing', cz: 'Památky', def: 'Visiting landmarks.', ex: 'We spent the day sightseeing in Prague.' },
+        { cat: 'general', word: 'Socializing', cz: 'Socializovat se', def: 'Spending time with people.', ex: 'Socializing is the best part of the weekend.' }
+    ];
+
+    // --- 1. VISUAL CHECK ---
+    function checkImages() {
+        let score = 0;
+        document.querySelectorAll('.img-select').forEach(sel => {
+            if(sel.value === sel.dataset.ans) {
+                sel.className = 'img-select correct';
+                score++;
+            } else {
+                sel.className = 'img-select incorrect';
+            }
+        });
+        const fb = document.getElementById('img-feedback');
+        fb.textContent = `You got ${score}/5 correct!`;
+        fb.className = score === 5 ? 'feedback success' : 'feedback error';
+        fb.style.display = 'block';
+    }
+
+    // --- 2. VOCAB TABLE ---
+    function filterVocab(category) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + category).classList.add('active');
+
+        const tbody = document.getElementById('vocab-body');
+        tbody.innerHTML = '';
+        
+        vocabData.filter(v => v.cat === category).forEach(v => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><strong>${v.word}</strong></td><td class="cz-word">${v.cz}</td><td>${v.def}<br><span class="ex-sentence">"${v.ex}"</span></td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- 3. MATCH GAME ---
+    let selectedEng = null;
+    
+    function initMatchGame() {
+        // Pick 8 random words
+        const gameItems = [...vocabData].sort(() => 0.5 - Math.random()).slice(0, 8);
+        const colEng = document.getElementById('col-eng');
+        const colCz = document.getElementById('col-cz');
+        document.getElementById('match-feedback').style.display = 'none';
+        
+        colEng.innerHTML = ''; colCz.innerHTML = '';
+
+        [...gameItems].sort(() => 0.5 - Math.random()).forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card'; el.textContent = item.word;
+            el.onclick = () => selectEng(el, item.word);
+            colEng.appendChild(el);
+        });
+
+        [...gameItems].sort(() => 0.5 - Math.random()).forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card'; el.textContent = item.cz;
+            el.dataset.match = item.word;
+            el.onclick = () => selectCz(el);
+            colCz.appendChild(el);
+        });
+    }
+
+    function selectEng(el, word) {
+        if(el.classList.contains('matched')) return;
+        document.querySelectorAll('#col-eng .match-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedEng = { el: el, word: word };
+    }
+
+    function selectCz(el) {
+        if(!selectedEng || el.classList.contains('matched')) return;
+        if(el.dataset.match === selectedEng.word) {
+            el.classList.add('matched');
+            selectedEng.el.classList.add('matched');
+            selectedEng.el.classList.remove('selected');
+            selectedEng = null;
+            if(document.querySelectorAll('#col-eng .match-card:not(.matched)').length === 0) {
+                const fb = document.getElementById('match-feedback');
+                fb.textContent = "Excellent Work!";
+                fb.className = "feedback success";
+                fb.style.display = 'block';
+            }
+        } else {
+            el.style.background = '#fee2e2';
+            setTimeout(() => el.style.background = 'white', 500);
+        }
+    }
+
+    // --- 4. GAP FILL ---
+    function initGapFill() {
+        const container = document.getElementById('gap-container');
+        // Pick 5 sentences
+        const items = [...vocabData].sort(() => 0.5 - Math.random()).slice(0, 5);
+        
+        items.forEach((item, idx) => {
+            const regex = new RegExp(item.word, 'gi');
+            const blankedEx = item.ex.replace(regex, '______');
+            const others = vocabData.filter(v => v.word !== item.word).sort(()=>0.5-Math.random()).slice(0,2).map(v=>v.word);
+            const options = [item.word, ...others].sort(()=>0.5-Math.random());
+            
+            const div = document.createElement('div');
+            div.className = 'fill-item';
+            
+            let optsHtml = `<select class="gap-select" data-ans="${item.word}"><option value="">---</option>`;
+            options.forEach(o => optsHtml += `<option value="${o}">${o}</option>`);
+            optsHtml += `</select>`;
+
+            div.innerHTML = `<strong>${idx+1}.</strong> ${blankedEx} <br> ${optsHtml}`;
+            container.appendChild(div);
+        });
+    }
+
+    function checkGapFill() {
+        let score = 0;
+        document.querySelectorAll('.gap-select').forEach(sel => {
+            if(sel.value === sel.dataset.ans) {
+                sel.className = 'gap-select correct'; score++;
+            } else {
+                sel.className = 'gap-select incorrect';
+            }
+        });
+        const fb = document.getElementById('gap-feedback');
+        fb.textContent = `You got ${score}/5`;
+        fb.className = score===5 ? 'feedback success' : 'feedback error';
+        fb.style.display = 'block';
+    }
+
+    // --- 5. TYPING TASK ---
+    function checkTyping() {
+        let score = 0;
+        document.querySelectorAll('.type-input').forEach(inp => {
+            if(inp.value.toLowerCase().trim() === inp.dataset.ans) {
+                inp.style.borderColor = "var(--secondary)";
+                inp.style.backgroundColor = "#ecfdf5";
+                score++;
+            } else {
+                inp.style.borderColor = "var(--danger)";
+                inp.style.backgroundColor = "#fef2f2";
+            }
+        });
+        const fb = document.getElementById('type-feedback');
+        fb.textContent = `You got ${score}/4 correct!`;
+        fb.className = score === 4 ? 'feedback success' : 'feedback error';
+        fb.style.display = 'block';
+    }
+
+    // --- 6. SPIN WHEEL ---
+    function spinWheel() {
+        const wheel = document.getElementById('wheel');
+        const output = document.getElementById('wheel-output');
+        
+        const deg = 1080 + Math.floor(Math.random() * 360);
+        wheel.style.transform = `rotate(${deg}deg)`;
+        
+        const randomItem = vocabData[Math.floor(Math.random() * vocabData.length)];
+        
+        output.innerHTML = "Spinning...";
+        
+        setTimeout(() => {
+            output.innerHTML = `
+                <span class="big-word">${randomItem.word}</span>
+                Make a sentence about: <strong>${randomItem.def}</strong>
+            `;
+        }, 4000); // 4s matches CSS transition
+    }
+
+
+    // --- INIT ---
+    window.onload = function() {
+        filterVocab('active');
+        initMatchGame();
+        initGapFill();
+    };
+
+</script>
+
+</body>
+</html>

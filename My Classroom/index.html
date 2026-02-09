@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 6 English Hub</title>
+    <style>
+        :root {
+            --primary: #2563eb; /* Royal Blue */
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 { margin: 0; color: var(--primary); font-size: 2.5rem; }
+        p.subtitle { color: #6b7280; font-size: 1.1rem; margin-top: 10px; }
+
+        /* The Category Buttons (Accordions) */
+        .category-btn {
+            background-color: var(--card-bg);
+            color: #374151;
+            cursor: pointer;
+            padding: 20px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: 0.3s;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .category-btn:hover {
+            background-color: #e0e7ff; /* Light blue hover */
+            color: var(--primary);
+        }
+
+        .category-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            margin-bottom: 0;
+        }
+
+        /* The Panel (Hidden by default) */
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            margin-bottom: 10px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        /* The Lesson Links */
+        .lesson-link {
+            display: block;
+            padding: 15px 0;
+            text-decoration: none;
+            color: #4b5563;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .lesson-link:last-child { border-bottom: none; }
+        .lesson-link:hover { padding-left: 10px; color: var(--primary); font-weight: bold; }
+        
+        /* Tag styles */
+        .tag { font-size: 0.8rem; background: #e5e7eb; padding: 2px 8px; border-radius: 10px; margin-left: 10px; color: #666; }
+        .tag-audio { background: #fee2e2; color: #991b1b; } /* Reddish tag for audio */
+        .tag-new { background: #dcfce7; color: #166534; } /* Green tag for new stuff */
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📚 Grade 6 English</h1>
+        <p class="subtitle">Interactive Revision</p>
+    </header>
+
+    <!-- My Life Section -->
+    <button class="category-btn">🏠 My Life and Home</button>
+    <div class="panel">
+        <a href="my-life/household-chores.html" class="lesson-link">
+            Household Chores <span class="tag tag-audio">Audio</span>
+        </a>
+        <!-- Added Link -->
+        <a href="my-life/my-life-vocab.html" class="lesson-link">
+            My Life Vocabulary <span class="tag tag-new">New</span>
+        </a>
+    </div>
+
+    <!-- School Section -->
+    <button class="category-btn">🏫 At School</button>
+    <div class="panel">
+        <a href="school/school-rules.html" class="lesson-link">
+            School Rules
+        </a>
+        <!-- Added Link -->
+        <a href="school/school-vocab.html" class="lesson-link">
+            School Vocabulary <span class="tag tag-new">New</span>
+        </a>
+    </div>
+
+    <!-- Fun Section -->
+    <button class="category-btn">🎉 Having Fun</button>
+    <div class="panel">
+        <a href="fun/hobbies.html" class="lesson-link">
+            Hobbies & Interests
+        </a>
+        <!-- Added Link -->
+        <a href="fun/hobbies-vocab.html" class="lesson-link">
+            Hobbies Vocabulary <span class="tag tag-new">New</span>
+        </a>
+    </div>
+    
+    <!-- Entertainment Section -->
+    <button class="category-btn">🎬 Entertainment</button>
+    <div class="panel">
+        <a href="entertainment/tv-shows.html" class="lesson-link">
+            TV Shows & My Dream <span class="tag tag-audio">Audio</span>
+        </a>
+    </div>
+
+    <!-- Holiday Section -->
+    <button class="category-btn">✈️ On Holiday</button>
+    <div class="panel">
+        <a href="holiday/holidays.html" class="lesson-link">
+            Holidays & Travel
+        </a>
+    </div>
+
+    <!-- Feelings Section -->
+    <button class="category-btn">😊 Different Feelings</button>
+    <div class="panel">
+        <a href="feelings/emotions.html" class="lesson-link">
+            Emotions
+        </a>
+        <!-- Added Link -->
+        <a href="feelings/emotions-vocab.html" class="lesson-link">
+            Emotions Vocabulary <span class="tag tag-new">New</span>
+        </a>
+    </div>
+
+    <!-- Grammar Section -->
+    <button class="category-btn">⚡ Grammar</button>
+    <div class="panel">
+        <a href="grammar/past-tense-irregulars.html" class="lesson-link">
+            Past Tense: Irregular Verbs <span class="tag">B1 Intermediate</span>
+        </a>
+    </div>
+
+</div>
+
+<script>
+    // Simple script to make the accordions open and close
+    var acc = document.getElementsByClassName("category-btn");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            } 
+        });
+    }
+</script>
+
+</body>
+</html>

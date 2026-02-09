@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotions & Feelings</title>
+    <style>
+        :root {
+            --primary: #7c3aed; /* Mood Purple */
+            --primary-dark: #5b21b6;
+            --secondary: #334155; /* Slate */
+            --bg: #f5f3ff; /* Very light purple */
+            --card-bg: #ffffff;
+            --success: #059669; /* Emerald */
+            --error: #db2777; /* Pink/Red for error */
+            --text-main: #1e293b;
+            --accent: #f59e0b; /* Gold */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-bottom: 5px solid var(--accent);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* --- Navigation --- */
+        .nav-scroller {
+            overflow-x: auto;
+            white-space: nowrap;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tabs {
+            display: inline-flex;
+            gap: 10px;
+            list-style: none;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid #ddd6fe;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary);
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* --- Sections --- */
+        .section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd6fe;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd6fe;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            margin: 15px 0 10px 0;
+            color: var(--text-main);
+        }
+
+        /* --- Components: Inputs & Buttons --- */
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        .gap-input {
+            width: 120px !important;
+            display: inline-block;
+            margin: 0 5px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #94a3b8;
+            border-bottom: 2px solid #94a3b8;
+            background: #f8fafc;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        button.action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        button.secondary-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: none;
+        }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; }
+        .feedback.error { background: #fce7f3; color: #9d174d; display: block; }
+
+        /* --- Activity: Vocab Sorter --- */
+        .sorter-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .sorter-area { grid-template-columns: 1fr; }
+        }
+
+        .drop-zone {
+            background: #f5f3ff;
+            border: 2px dashed #a78bfa;
+            border-radius: 8px;
+            min-height: 200px;
+            padding: 10px;
+        }
+
+        .drop-zone h4 { text-align: center; margin-bottom: 10px; }
+        .drop-zone.positive { border-color: var(--success); background: #ecfdf5; } 
+        .drop-zone.negative { border-color: var(--error); background: #fff1f2; } 
+
+        .vocab-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+
+        .vocab-item {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .vocab-item.selected {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* --- Activity: Scramble --- */
+        .scramble-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .scramble-word {
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            font-weight: bold;
+            color: var(--secondary);
+            background: #e2e8f0;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        /* --- Readings --- */
+        .reading-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #334155;
+            padding: 20px;
+            background: #fff;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .question-block {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .options label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        /* --- Game Section --- */
+        .game-screen {
+            text-align: center;
+            padding: 20px;
+        }
+        .timer-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .timer-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--primary);
+            transition: width 1s linear;
+        }
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .game-btn {
+            width: 45%;
+            padding: 20px;
+            margin: 10px 2%;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-green { background: var(--success); }
+        .btn-red { background: var(--error); }
+
+        /* Images */
+        .img-header {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Emotions & Feelings</h1>
+        <p>B1 Intermediate ESL Lesson</p>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav-scroller">
+        <ul class="nav-tabs" id="navTabs">
+            <li><button class="nav-btn active" onclick="showTab('warmup')">Warm-Up</button></li>
+            <li><button class="nav-btn" onclick="showTab('vocab1')">Sorter</button></li>
+            <li><button class="nav-btn" onclick="showTab('gapfill')">Gap Fill</button></li>
+            <li><button class="nav-btn" onclick="showTab('spelling')">Spelling</button></li>
+            <li><button class="nav-btn" onclick="showTab('reading1')">Reading</button></li>
+            <li><button class="nav-btn" onclick="showTab('fun')">Mood Doctor</button></li>
+            <li><button class="nav-btn" onclick="showTab('game')">Mood Swings</button></li>
+        </ul>
+    </div>
+
+    <!-- 1. Warm-up Section -->
+    <div id="warmup" class="section active">
+        <div class="card">
+            <h2>Warm-Up Discussion</h2>
+            <img src="https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&q=80&w=1000" alt="Emotions" class="img-header">
+            <p style="margin-bottom: 15px;">Discuss these questions with your partner or type your thoughts:</p>
+            
+            <h3>1. What makes you feel anxious? How do you calm down?</h3>
+            <textarea id="wu1" rows="2" placeholder="I feel anxious when... I calm down by..."></textarea>
+            
+            <h3>2. When was the last time you felt really proud of yourself?</h3>
+            <textarea id="wu2" rows="2" placeholder="I felt proud when..."></textarea>
+
+            <h3>3. Do you think it is better to hide your emotions or show them?</h3>
+            <textarea id="wu3" rows="2" placeholder="I think it is better to..."></textarea>
+
+            <button class="action-btn" onclick="checkWarmup()">Submit Answers</button>
+            <div id="wu-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 2. Vocab Sorter -->
+    <div id="vocab1" class="section">
+        <div class="card">
+            <h2>Emotion Sorter</h2>
+            <p>Tap a feeling, then tap the box where it belongs. Is it generally <strong>Positive</strong> or <strong>Negative</strong>?</p>
+            
+            <div class="vocab-pool" id="vocabPool">
+                <!-- JS will populate this -->
+            </div>
+
+            <div class="sorter-area">
+                <div class="drop-zone positive" onclick="moveToBox('positive')">
+                    <h4>😊 Positive</h4>
+                    <div id="box-positive"></div>
+                </div>
+                <div class="drop-zone negative" onclick="moveToBox('negative')">
+                    <h4>😟 Negative</h4>
+                    <div id="box-negative"></div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                 <button class="action-btn" onclick="checkSorter()">Check Answers</button>
+                 <button class="secondary-btn" onclick="resetSorter()">Reset</button>
+            </div>
+            <div id="sorter-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 3. Gap Fill Drill -->
+    <div id="gapfill" class="section">
+        <div class="card">
+            <h2>Gap Fill: Stress Management</h2>
+            <p>Type the missing words into the boxes. Use the word bank below.</p>
+            
+            <div style="background:#f1f5f9; padding:10px; margin-bottom:15px; border-radius:8px; font-weight:bold; color:var(--secondary); text-align:center;">
+                Bank: overwhelmed, breathe, pressure, relax, support, mental
+            </div>
+
+            <div class="reading-text" style="line-height: 2.5;">
+                <p>Modern life is very fast, and many people often feel <input type="text" class="gap-input" data-ans="overwhelmed"> by their work or studies.
+                When you are under a lot of <input type="text" class="gap-input" data-ans="pressure">, it is important to take a break.
+                Doctors say you should take a deep <input type="text" class="gap-input" data-ans="breathe"> and try to clear your mind.
+                Physical exercise is also a great way to <input type="text" class="gap-input" data-ans="relax"> your body.
+                Finally, do not be afraid to ask for <input type="text" class="gap-input" data-ans="support"> from friends if your <input type="text" class="gap-input" data-ans="mental"> health is suffering.</p>
+            </div>
+
+            <button class="action-btn" onclick="checkGapFill()">Check Spelling</button>
+            <div id="gap-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 4. Spelling Scramble -->
+    <div id="spelling" class="section">
+        <div class="card">
+            <h2>Word Scramble</h2>
+            <p>Unscramble the emotion words.</p>
+            <div id="scramble-container">
+                <!-- JS Populated -->
+            </div>
+            <button class="action-btn" onclick="checkScramble()">Check Words</button>
+            <div id="scramble-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 5. Reading -->
+    <div id="reading1" class="section">
+        <div class="card">
+            <h2>Reading: Emotional Intelligence (EQ)</h2>
+            <img src="https://images.unsplash.com/photo-1551847677-dc82d764e1eb?auto=format&fit=crop&q=80&w=1000" alt="Thinking" class="img-header">
+            
+            <div class="reading-text">
+                <p>We all know about IQ (Intelligence Quotient), which measures how smart you are academically. But have you heard of <strong>EQ</strong>? Emotional Intelligence is the ability to understand and manage your own emotions, as well as recognize emotions in others.</p>
+                <br>
+                <p>People with high EQ are usually very <strong>empathetic</strong>. This means they can put themselves in someone else's shoes. For example, if a colleague is quiet, a high-EQ person might ask if they are okay, rather than assuming they are rude. In the workplace, EQ is becoming just as important as technical skills because it helps with <strong>teamwork</strong> and leadership.</p>
+                <br>
+                <p>Fortunately, unlike IQ which is hard to change, you can <strong>improve</strong> your EQ with practice. It starts with self-awareness: stopping to ask yourself, "Why am I feeling this way?"</p>
+            </div>
+
+            <h3>Comprehension Check</h3>
+            <div id="quiz-r1"></div>
+            <button class="action-btn" onclick="checkReading1()">Check Answers</button>
+            <div id="r1-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 6. Fun Task -->
+    <div id="fun" class="section">
+        <div class="card">
+            <h2>The Mood Doctor</h2>
+            <p>Read the patient's problem. Choose the best advice for them.</p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <div id="doctor-scenario">
+                <!-- JS Populated -->
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="secondary-btn" onclick="nextDoctorScenario()">Next Patient</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Game -->
+    <div id="game" class="section">
+        <div class="card game-screen">
+            <h2>Mood Swings!</h2>
+            <p>An emotion will appear. Is it <strong>POSITIVE</strong> or <strong>NEGATIVE</strong>? Speed is key!</p>
+            <br>
+            <button class="action-btn" id="start-game-btn" onclick="startGame()">Start Game</button>
+            
+            <div id="game-ui" style="display:none;">
+                <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+                <div class="score-display">Score: <span id="score">0</span></div>
+                
+                <h2 id="game-prompt" style="font-size: 2rem; margin: 30px 0;">Prompt</h2>
+                
+                <div>
+                    <button class="game-btn btn-green" onclick="answerGame('positive')">POSITIVE 😊</button>
+                    <button class="game-btn btn-red" onclick="answerGame('negative')">NEGATIVE 😟</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Data ---
+    const vocabList = [
+        { word: "Delighted", type: "positive" },
+        { word: "Furious", type: "negative" },
+        { word: "Relieved", type: "positive" },
+        { word: "Jealous", type: "negative" },
+        { word: "Confident", type: "positive" },
+        { word: "Embarrassed", type: "negative" },
+        { word: "Grateful", type: "positive" },
+        { word: "Lonely", type: "negative" },
+        { word: "Anxious", type: "negative" },
+        { word: "Inspired", type: "positive" },
+        { word: "Guilty", type: "negative" },
+        { word: "Curious", type: "positive" }
+    ];
+
+    const scrambleWords = [
+        { word: "NERVOUS", scrambled: "VORUSNE" },
+        { word: "SURPRISED", scrambled: "PRISERSUD" },
+        { word: "CONFUSED", scrambled: "SUFCONED" },
+        { word: "EXCITED", scrambled: "DEXITEC" },
+        { word: "ANGRY", scrambled: "YRANG" }
+    ];
+
+    const reading1Questions = [
+        { q: "What does EQ measure?", options: ["Academic intelligence", "Emotional intelligence", "Memory"], a: 1 },
+        { q: "What does 'empathetic' mean?", options: ["Feeling sorry", "Understanding others' feelings", "Being selfish"], a: 1 },
+        { q: "Why is EQ important at work?", options: ["It helps with teamwork", "It makes you work faster", "It earns more money"], a: 0 },
+        { q: "Can you improve your EQ?", options: ["No, never", "Yes, with practice", "Only when you are a child"], a: 1 }
+    ];
+
+    const doctorScenarios = [
+        { text: "I have a big presentation tomorrow and I'm terrified!", opts: ["Prepare and breathe", "Don't go", "Drink lots of coffee"] },
+        { text: "My friend has a better car than me and I feel jealous.", opts: ["Buy a Ferrari", "Steal the car", "Focus on gratitude"] },
+        { text: "I said something stupid at a party and feel embarrassed.", opts: ["Laugh it off", "Never go out again", "Shout at everyone"] },
+        { text: "I feel lonely living in a new city.", opts: ["Stay inside", "Join a club", "Sleep all day"] }
+    ];
+
+    const gameData = [
+        { word: "Joyful", type: "positive" },
+        { word: "Miserable", type: "negative" },
+        { word: "Hopeful", type: "positive" },
+        { word: "Terrified", type: "negative" },
+        { word: "Calm", type: "positive" },
+        { word: "Stressed", type: "negative" },
+        { word: "Proud", type: "positive" },
+        { word: "Disappointed", type: "negative" },
+        { word: "Excited", type: "positive" },
+        { word: "Bored", type: "negative" }
+    ];
+
+    // --- State ---
+    let selectedWord = null;
+    let selectedElement = null;
+    let gameScore = 0;
+    let gameTimer = null;
+    let doctorIndex = 0;
+    let gameItems = [];
+    let currentItem = null;
+
+    // --- Navigation ---
+    function showTab(tabId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        
+        // Highlight button
+        const btns = document.querySelectorAll('.nav-btn');
+        btns.forEach(btn => {
+            if(btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active');
+        });
+    }
+
+    // --- Warm Up ---
+    function checkWarmup() {
+        const w1 = document.getElementById('wu1').value;
+        const fb = document.getElementById('wu-feedback');
+        if(w1.length > 3) {
+            fb.textContent = "Good reflection. Share this with your partner.";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = "Try to explain your feelings a bit more.";
+            fb.className = "feedback error";
+        }
+    }
+
+    // --- Vocab Sorter ---
+    function initSorter() {
+        const pool = document.getElementById('vocabPool');
+        pool.innerHTML = '';
+        document.getElementById('box-positive').innerHTML = '';
+        document.getElementById('box-negative').innerHTML = '';
+        
+        vocabList.sort(() => Math.random() - 0.5);
+
+        vocabList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vocab-item';
+            div.textContent = item.word;
+            div.dataset.type = item.type;
+            div.onclick = function() { selectWord(this); };
+            pool.appendChild(div);
+        });
+    }
+
+    function selectWord(el) {
+        if(selectedElement) selectedElement.classList.remove('selected');
+        selectedElement = el;
+        selectedElement.classList.add('selected');
+    }
+
+    function moveToBox(type) {
+        if(!selectedElement) return;
+        const targetBox = document.getElementById(`box-${type}`);
+        const clone = selectedElement.cloneNode(true);
+        clone.classList.remove('selected');
+        clone.style.margin = '5px';
+        clone.style.display = 'inline-block';
+        clone.onclick = null;
+        targetBox.appendChild(clone);
+        selectedElement.remove();
+        selectedElement = null;
+    }
+
+    function checkSorter() {
+        const positive = document.getElementById('box-positive').children;
+        const negative = document.getElementById('box-negative').children;
+        let errors = 0;
+
+        for(let el of positive) { if(el.dataset.type !== 'positive') errors++; }
+        for(let el of negative) { if(el.dataset.type !== 'negative') errors++; }
+
+        const fb = document.getElementById('sorter-feedback');
+        if(document.getElementById('vocabPool').children.length > 0) {
+            fb.textContent = "Finish sorting all words first!";
+            fb.className = "feedback error";
+        } else if(errors === 0) {
+            fb.textContent = "Perfect! You understand these emotions.";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = `You have ${errors} mistakes. Think about the meaning.`;
+            fb.className = "feedback error";
+        }
+    }
+
+    function resetSorter() {
+        initSorter();
+        document.getElementById('sorter-feedback').style.display = 'none';
+    }
+
+    // --- Gap Fill ---
+    function checkGapFill() {
+        const inputs = document.querySelectorAll('.gap-input');
+        let correct = 0;
+        
+        inputs.forEach(input => {
+            if(input.value.toLowerCase().trim() === input.dataset.ans) {
+                input.style.borderColor = "var(--success)";
+                input.style.backgroundColor = "#dcfce7";
+                correct++;
+            } else {
+                input.style.borderColor = "var(--error)";
+                input.style.backgroundColor = "#fee2e2";
+            }
+        });
+
+        const fb = document.getElementById('gap-feedback');
+        fb.textContent = `You got ${correct}/${inputs.length} correct.`;
+        fb.className = correct === inputs.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Scramble ---
+    function initScramble() {
+        const container = document.getElementById('scramble-container');
+        let html = '';
+        scrambleWords.forEach((item, index) => {
+            html += `
+            <div class="scramble-row">
+                <span class="scramble-word">${item.scrambled}</span>
+                <input type="text" id="scr-${index}" placeholder="Type answer..." style="width: 150px; margin:0;">
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkScramble() {
+        let correct = 0;
+        scrambleWords.forEach((item, index) => {
+            const input = document.getElementById(`scr-${index}`);
+            if(input.value.toUpperCase().trim() === item.word) {
+                input.style.borderColor = "var(--success)";
+                correct++;
+            } else {
+                input.style.borderColor = "var(--error)";
+            }
+        });
+        const fb = document.getElementById('scramble-feedback');
+        fb.textContent = `You got ${correct}/${scrambleWords.length} correct.`;
+        fb.className = correct === scrambleWords.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Reading Quiz ---
+    function initReading1() {
+        const container = document.getElementById('quiz-r1');
+        let html = '';
+        reading1Questions.forEach((q, idx) => {
+            html += `<div class="question-block"><p><strong>${idx+1}. ${q.q}</strong></p><div class="options">`;
+            q.options.forEach((opt, oIdx) => {
+                html += `<label><input type="radio" name="r1q${idx}" value="${oIdx}"> ${opt}</label>`;
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkReading1() {
+        let score = 0;
+        reading1Questions.forEach((q, idx) => {
+            const selected = document.querySelector(`input[name="r1q${idx}"]:checked`);
+            if(selected && parseInt(selected.value) === q.a) score++;
+        });
+        const fb = document.getElementById('r1-feedback');
+        fb.textContent = `Score: ${score}/${reading1Questions.length}`;
+        fb.className = score === reading1Questions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Mood Doctor ---
+    function renderDoctor() {
+        const container = document.getElementById('doctor-scenario');
+        if(doctorIndex >= doctorScenarios.length) doctorIndex = 0;
+        
+        const current = doctorScenarios[doctorIndex];
+        
+        container.innerHTML = `
+            <h3 style="text-align:center;">Patient #${doctorIndex + 1}</h3>
+            <p style="font-size: 1.2rem; text-align:center; margin: 20px 0;">"${current.text}"</p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="action-btn" onclick="alert('Great advice!')">${current.opts[0]}</button>
+                <button class="action-btn" style="background:var(--secondary)" onclick="alert('That is terrible advice!')">${current.opts[1]}</button>
+                <button class="action-btn" style="background:var(--accent)" onclick="alert('Maybe...?')">${current.opts[2]}</button>
+            </div>
+        `;
+    }
+
+    function nextDoctorScenario() {
+        doctorIndex++;
+        renderDoctor();
+    }
+
+    // --- Game Logic ---
+    function startGame() {
+        gameItems = [...gameData];
+        document.getElementById('start-game-btn').style.display = 'none';
+        document.getElementById('game-ui').style.display = 'block';
+        gameScore = 0;
+        document.getElementById('score').innerText = gameScore;
+        nextGameItem();
+    }
+
+    function nextGameItem() {
+        if(gameItems.length === 0) {
+            endGame();
+            return;
+        }
+        
+        const idx = Math.floor(Math.random() * gameItems.length);
+        currentItem = gameItems[idx];
+        document.getElementById('game-prompt').innerText = currentItem.word;
+        
+        // Timer
+        const bar = document.getElementById('timer-fill');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        setTimeout(() => {
+            bar.style.transition = 'width 2.5s linear';
+            bar.style.width = '0%';
+        }, 10);
+
+        if(gameTimer) clearTimeout(gameTimer);
+        gameTimer = setTimeout(() => {
+            answerGame(null);
+        }, 2500);
+    }
+
+    function answerGame(choice) {
+        clearTimeout(gameTimer);
+        let correct = false;
+        if(choice === currentItem.type) correct = true;
+        
+        if(correct) {
+            gameScore += 10;
+            document.getElementById('score').innerText = gameScore;
+        }
+
+        gameItems = gameItems.filter(i => i !== currentItem);
+        nextGameItem();
+    }
+
+    function endGame() {
+        document.getElementById('game-ui').innerHTML = `
+            <h2>Time's Up!</h2>
+            <p>Final Score: ${gameScore}</p>
+            <button class="action-btn" onclick="location.reload()">Play Again</button>
+        `;
+    }
+
+    // --- Initialization ---
+    window.onload = function() {
+        initSorter();
+        initScramble();
+        initReading1();
+        renderDoctor();
+    }
+
+</script>
+
+</body>
+</html>

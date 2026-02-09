@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Rules</title>
+    <style>
+        :root {
+            --primary: #2563eb; /* Royal Blue */
+            --primary-dark: #1e40af;
+            --secondary: #64748b; /* Slate */
+            --bg: #f8fafc; /* Very light cool gray */
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --error: #ef4444;
+            --text-main: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* --- Navigation --- */
+        .nav-scroller {
+            overflow-x: auto;
+            white-space: nowrap;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tabs {
+            display: inline-flex;
+            gap: 10px;
+            list-style: none;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary);
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* --- Sections --- */
+        .section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            margin: 15px 0 10px 0;
+            color: var(--text-main);
+        }
+
+        /* --- Components: Inputs & Buttons --- */
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        button.action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        button.secondary-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: none;
+        }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        /* --- Activity: Vocab Sorter --- */
+        .sorter-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .sorter-area { grid-template-columns: 1fr; }
+        }
+
+        .drop-zone {
+            background: #f1f5f9;
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            min-height: 200px;
+            padding: 10px;
+        }
+
+        .drop-zone h4 { text-align: center; margin-bottom: 10px; }
+        .drop-zone.positive { border-color: var(--success); }
+        .drop-zone.negative { border-color: var(--error); }
+
+        .vocab-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+
+        .vocab-item {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .vocab-item.selected {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* --- Activity: Definition Match --- */
+        .match-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+        
+        .match-row select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            max-width: 150px;
+        }
+
+        /* --- Readings --- */
+        .reading-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #334155;
+            padding: 20px;
+            background: #fff;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .question-block {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .options label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        /* --- Game Section --- */
+        .game-screen {
+            text-align: center;
+            padding: 20px;
+        }
+        .timer-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .timer-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--primary);
+            transition: width 1s linear;
+        }
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .game-btn {
+            width: 45%;
+            padding: 20px;
+            margin: 10px 2%;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-green { background: var(--success); }
+        .btn-red { background: var(--error); }
+
+        /* Images */
+        .img-header {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>School Rules & Expectations</h1>
+        <p>B1 Intermediate ESL Lesson</p>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav-scroller">
+        <ul class="nav-tabs" id="navTabs">
+            <li><button class="nav-btn active" onclick="showTab('warmup')">Warm-Up</button></li>
+            <li><button class="nav-btn" onclick="showTab('vocab1')">Sorter</button></li>
+            <li><button class="nav-btn" onclick="showTab('vocab2')">Definitions</button></li>
+            <li><button class="nav-btn" onclick="showTab('reading1')">Reading 1</button></li>
+            <li><button class="nav-btn" onclick="showTab('reading2')">Reading 2</button></li>
+            <li><button class="nav-btn" onclick="showTab('fun')">Principal Mode</button></li>
+            <li><button class="nav-btn" onclick="showTab('game')">Speed Game</button></li>
+        </ul>
+    </div>
+
+    <!-- 1. Warm-up Section -->
+    <div id="warmup" class="section active">
+        <div class="card">
+            <h2>Warm-Up Discussion</h2>
+            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1000" alt="Classroom" class="img-header">
+            <p style="margin-bottom: 15px;">Think about your school (current or past). Answer the following questions:</p>
+            
+            <h3>1. What is the strictest rule in your school?</h3>
+            <textarea id="wu1" rows="2" placeholder="The strictest rule is..."></textarea>
+            
+            <h3>2. Do you think school uniforms are a good idea? Why/Why not?</h3>
+            <textarea id="wu2" rows="2" placeholder="I think uniforms are... because..."></textarea>
+
+            <h3>3. What happens if you are late to class?</h3>
+            <textarea id="wu3" rows="2" placeholder="If I am late..."></textarea>
+
+            <button class="action-btn" onclick="checkWarmup()">Submit Answers</button>
+            <div id="wu-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 2. Vocab Sorter -->
+    <div id="vocab1" class="section">
+        <div class="card">
+            <h2>Vocabulary Sorter</h2>
+            <p>Tap a word, then tap the box where it belongs. Is it a <strong>Positive Action</strong> (Do) or a <strong>Negative Action</strong> (Don't)?</p>
+            
+            <div class="vocab-pool" id="vocabPool">
+                <!-- JS will populate this -->
+            </div>
+
+            <div class="sorter-area">
+                <div class="drop-zone positive" onclick="moveToBox('positive')">
+                    <h4>✅ DO (Good)</h4>
+                    <div id="box-positive"></div>
+                </div>
+                <div class="drop-zone negative" onclick="moveToBox('negative')">
+                    <h4>❌ DON'T (Bad)</h4>
+                    <div id="box-negative"></div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                 <button class="action-btn" onclick="checkSorter()">Check Answers</button>
+                 <button class="secondary-btn" onclick="resetSorter()">Reset</button>
+            </div>
+            <div id="sorter-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 3. Vocab Drill -->
+    <div id="vocab2" class="section">
+        <div class="card">
+            <h2>Match the Definitions</h2>
+            <p>Select the correct word for each definition.</p>
+            <div id="definition-container">
+                <!-- JS Populated -->
+            </div>
+            <button class="action-btn" onclick="checkDefinitions()">Check Definitions</button>
+            <div id="def-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 4. Reading 1 -->
+    <div id="reading1" class="section">
+        <div class="card">
+            <h2>Reading: The Strict Academy</h2>
+            <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000" alt="Strict School" class="img-header">
+            
+            <div class="reading-text">
+                <p>Welcome to Blackwood Academy, one of the most prestigious schools in the country. However, academic excellence comes at a price: strict discipline. Students must be <strong>punctual</strong>; the school gates lock at 8:00 AM sharp. If you are late, you receive immediate <strong>detention</strong> after school.</p>
+                <br>
+                <p>The <strong>uniform</strong> policy is rigorous. Blazers must be worn at all times, even in summer. <strong>Cheating</strong> on exams results in immediate <strong>suspension</strong>, and <strong>bullying</strong> is met with a zero-tolerance policy. Despite these harsh rules, the <strong>principal</strong> believes that discipline creates success. "We teach <strong>respect</strong> first, mathematics second," he often says during the morning <strong>assembly</strong>.</p>
+            </div>
+
+            <h3>Comprehension Check</h3>
+            <div id="quiz-r1"></div>
+            <button class="action-btn" onclick="checkReading1()">Check Answers</button>
+            <div id="r1-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 5. Reading 2 -->
+    <div id="reading2" class="section">
+        <div class="card">
+            <h2>Cultural Corner: Rules Around the World</h2>
+            <div class="reading-text">
+                <p>School rules vary wildly depending on where you live. In <strong>Japan</strong>, students often have to clean their own classrooms. This is called 'O-soji'. It teaches them respect for their environment. They also cannot wear makeup or jewelry.</p>
+                <br>
+                <p>In the <strong>USA</strong>, the dress code is usually more relaxed in public schools, though private schools often require uniforms. However, "Hall Passes" are common—students cannot walk in the <strong>corridor</strong> without a paper pass from a teacher.</p>
+                <br>
+                <p>In <strong>Finland</strong>, the rules are very relaxed. Students address teachers by their first names, there are very few exams, and <strong>homework</strong> is minimal. They believe play and rest are crucial for learning.</p>
+            </div>
+
+            <h3>True or False?</h3>
+            <div id="quiz-r2"></div>
+            <button class="action-btn" onclick="checkReading2()">Check Answers</button>
+            <div id="r2-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 6. Fun Task -->
+    <div id="fun" class="section">
+        <div class="card">
+            <h2>You are the Principal!</h2>
+            <p>Read the student scenarios below. As the Principal, you must decide the punishment (or reward).</p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <div id="principal-scenario">
+                <!-- JS Populated -->
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="secondary-btn" onclick="nextScenario()">Next Student</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Game -->
+    <div id="game" class="section">
+        <div class="card game-screen">
+            <h2>Speed Enforcer</h2>
+            <p>A rule will appear. Is it GOOD behavior or BAD behavior? Be fast!</p>
+            <br>
+            <button class="action-btn" id="start-game-btn" onclick="startGame()">Start Game</button>
+            
+            <div id="game-ui" style="display:none;">
+                <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+                <div class="score-display">Score: <span id="score">0</span></div>
+                
+                <h2 id="game-prompt" style="font-size: 2rem; margin: 30px 0;">Prompt</h2>
+                
+                <div>
+                    <button class="game-btn btn-green" onclick="answerGame(true)">GOOD 👍</button>
+                    <button class="game-btn btn-red" onclick="answerGame(false)">BAD 👎</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Data ---
+    const vocabList = [
+        { word: "Raise hand", type: "positive" },
+        { word: "Bullying", type: "negative" },
+        { word: "Cheating", type: "negative" },
+        { word: "Be Punctual", type: "positive" },
+        { word: "Show Respect", type: "positive" },
+        { word: "Truancy", type: "negative" },
+        { word: "Vandalism", type: "negative" },
+        { word: "Do Homework", type: "positive" },
+        { word: "Skip Class", type: "negative" },
+        { word: "Participation", type: "positive" },
+        { word: "Shouting", type: "negative" },
+        { word: "Listen", type: "positive" },
+        { word: "Running", type: "negative" },
+        { word: "Helping", type: "positive" },
+        { word: "Littering", type: "negative" }
+    ];
+
+    const definitions = [
+        { word: "Suspension", def: "Being forced to stay away from school for a short time as punishment." },
+        { word: "Detention", def: "Staying after school hours as a punishment." },
+        { word: "Assembly", def: "A regular gathering of all students and teachers." },
+        { word: "Corridor", def: "A long passage in a building from which doors lead into rooms." },
+        { word: "Truancy", def: "The action of staying away from school without good reason." },
+        { word: "Punctual", def: "Happening or doing something at the agreed or proper time." }
+    ];
+
+    const reading1Questions = [
+        { q: "What happens at 8:00 AM?", options: ["School starts", "Gates lock", "Breakfast ends"], a: 1 },
+        { q: "What is the policy on blazers?", options: ["Only in winter", "Only in assembly", "Worn at all times"], a: 2 },
+        { q: "What is the consequence of cheating?", options: ["Detention", "Suspension", "Warning"], a: 1 },
+        { q: "What is the Principal's priority?", options: ["Math", "Sports", "Respect"], a: 2 }
+    ];
+
+    const reading2Questions = [
+        { q: "In Japan, students clean their own classrooms.", a: "True" },
+        { q: "In the USA, students need a passport to walk in the hall.", a: "False" },
+        { q: "Finnish schools give a lot of homework.", a: "False" },
+        { q: "O-soji teaches respect for the environment.", a: "True" }
+    ];
+
+    const scenarios = [
+        "Student A was caught copying homework from Student B.",
+        "Student C found a lost wallet and gave it to the teacher.",
+        "Student D was running in the corridor and knocked over a plant.",
+        "Student E helped a new student find their classroom.",
+        "Student F used their phone during an exam."
+    ];
+
+    // --- State ---
+    let selectedWord = null;
+    let selectedElement = null;
+    let gameScore = 0;
+    let gameTimer = null;
+    let scenarioIndex = 0;
+
+    // --- Navigation ---
+    function showTab(tabId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        
+        // Highlight button
+        const btns = document.querySelectorAll('.nav-btn');
+        btns.forEach(btn => {
+            if(btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active');
+        });
+    }
+
+    // --- Warm Up ---
+    function checkWarmup() {
+        const w1 = document.getElementById('wu1').value;
+        const w2 = document.getElementById('wu2').value;
+        const w3 = document.getElementById('wu3').value;
+        const fb = document.getElementById('wu-feedback');
+
+        if(w1.length > 5 && w2.length > 5 && w3.length > 5) {
+            fb.textContent = "Great answers! Discuss them with your partner or teacher.";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = "Please write fuller sentences for all questions.";
+            fb.className = "feedback error";
+        }
+    }
+
+    // --- Vocab Sorter ---
+    function initSorter() {
+        const pool = document.getElementById('vocabPool');
+        pool.innerHTML = '';
+        document.getElementById('box-positive').innerHTML = '';
+        document.getElementById('box-negative').innerHTML = '';
+        
+        // Shuffle
+        vocabList.sort(() => Math.random() - 0.5);
+
+        vocabList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vocab-item';
+            div.textContent = item.word;
+            div.dataset.type = item.type;
+            div.onclick = function() { selectWord(this); };
+            pool.appendChild(div);
+        });
+    }
+
+    function selectWord(el) {
+        if(selectedElement) selectedElement.classList.remove('selected');
+        selectedElement = el;
+        selectedElement.classList.add('selected');
+    }
+
+    function moveToBox(type) {
+        if(!selectedElement) return;
+        
+        const targetBox = document.getElementById(`box-${type}`);
+        // Create new element in box
+        const clone = selectedElement.cloneNode(true);
+        clone.classList.remove('selected');
+        clone.style.margin = '5px';
+        clone.style.display = 'inline-block';
+        clone.onclick = null; // Remove click to move
+        
+        targetBox.appendChild(clone);
+        selectedElement.remove();
+        selectedElement = null;
+    }
+
+    function checkSorter() {
+        const positives = document.getElementById('box-positive').children;
+        const negatives = document.getElementById('box-negative').children;
+        let errors = 0;
+
+        for(let el of positives) { if(el.dataset.type !== 'positive') errors++; }
+        for(let el of negatives) { if(el.dataset.type !== 'negative') errors++; }
+
+        const fb = document.getElementById('sorter-feedback');
+        if(document.getElementById('vocabPool').children.length > 0) {
+            fb.textContent = "Finish sorting all words first!";
+            fb.className = "feedback error";
+        } else if(errors === 0) {
+            fb.textContent = "Perfect! All rules sorted correctly.";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = `You have ${errors} mistakes. Try to find them.`;
+            fb.className = "feedback error";
+        }
+    }
+
+    function resetSorter() {
+        initSorter();
+        document.getElementById('sorter-feedback').style.display = 'none';
+    }
+
+    // --- Definitions ---
+    function initDef() {
+        const container = document.getElementById('definition-container');
+        let html = '';
+        
+        // Create options string
+        let options = '<option value="">--Select--</option>';
+        // Shuffle words for dropdown
+        const shuffledWords = [...definitions].sort(() => Math.random() - 0.5);
+        shuffledWords.forEach(d => options += `<option value="${d.word}">${d.word}</option>`);
+
+        definitions.forEach((item, index) => {
+            html += `
+            <div class="match-row">
+                <span>${item.def}</span>
+                <select id="def-${index}" data-answer="${item.word}">${options}</select>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkDefinitions() {
+        let correct = 0;
+        definitions.forEach((item, index) => {
+            const select = document.getElementById(`def-${index}`);
+            if(select.value === item.word) {
+                select.style.borderColor = "var(--success)";
+                select.style.borderWidth = "2px";
+                correct++;
+            } else {
+                select.style.borderColor = "var(--error)";
+                select.style.borderWidth = "2px";
+            }
+        });
+        
+        const fb = document.getElementById('def-feedback');
+        fb.textContent = `You got ${correct}/${definitions.length} correct.`;
+        fb.className = correct === definitions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Reading 1 Quiz ---
+    function initReading1() {
+        const container = document.getElementById('quiz-r1');
+        let html = '';
+        reading1Questions.forEach((q, idx) => {
+            html += `<div class="question-block"><p><strong>${idx+1}. ${q.q}</strong></p><div class="options">`;
+            q.options.forEach((opt, oIdx) => {
+                html += `<label><input type="radio" name="r1q${idx}" value="${oIdx}"> ${opt}</label>`;
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkReading1() {
+        let score = 0;
+        reading1Questions.forEach((q, idx) => {
+            const selected = document.querySelector(`input[name="r1q${idx}"]:checked`);
+            if(selected && parseInt(selected.value) === q.a) score++;
+        });
+        const fb = document.getElementById('r1-feedback');
+        fb.textContent = `Score: ${score}/${reading1Questions.length}`;
+        fb.className = score === reading1Questions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Reading 2 Quiz ---
+    function initReading2() {
+        const container = document.getElementById('quiz-r2');
+        let html = '';
+        reading2Questions.forEach((q, idx) => {
+            html += `<div class="question-block"><div style="display:flex; justify-content:space-between;">
+                <span>${q.q}</span>
+                <div>
+                    <select id="r2q${idx}">
+                        <option value="">?</option>
+                        <option value="True">True</option>
+                        <option value="False">False</option>
+                    </select>
+                </div>
+            </div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkReading2() {
+        let score = 0;
+        reading2Questions.forEach((q, idx) => {
+            const val = document.getElementById(`r2q${idx}`).value;
+            if(val === q.a) score++;
+        });
+        const fb = document.getElementById('r2-feedback');
+        fb.textContent = `Score: ${score}/${reading2Questions.length}`;
+        fb.className = score === reading2Questions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Principal Scenario ---
+    function renderScenario() {
+        const container = document.getElementById('principal-scenario');
+        if(scenarioIndex >= scenarios.length) scenarioIndex = 0;
+        
+        container.innerHTML = `
+            <h3 style="text-align:center;">Scenario #${scenarioIndex + 1}</h3>
+            <p style="font-size: 1.2rem; text-align:center; margin: 20px 0;">"${scenarios[scenarioIndex]}"</p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="action-btn" onclick="alert('Student punished!')">Give Detention</button>
+                <button class="action-btn" style="background:#f59e0b" onclick="alert('Student warned!')">Give Warning</button>
+                <button class="action-btn" style="background:var(--success)" onclick="alert('Student praised!')">Give Reward</button>
+            </div>
+        `;
+    }
+
+    function nextScenario() {
+        scenarioIndex++;
+        renderScenario();
+    }
+
+    // --- Game Logic ---
+    let gameItems = [...vocabList]; // Reuse vocab list
+    let currentItem = null;
+
+    function startGame() {
+        document.getElementById('start-game-btn').style.display = 'none';
+        document.getElementById('game-ui').style.display = 'block';
+        gameScore = 0;
+        document.getElementById('score').innerText = gameScore;
+        nextGameItem();
+    }
+
+    function nextGameItem() {
+        if(gameItems.length === 0) {
+            endGame();
+            return;
+        }
+        
+        // Random pick
+        const idx = Math.floor(Math.random() * gameItems.length);
+        currentItem = gameItems[idx];
+        document.getElementById('game-prompt').innerText = currentItem.word;
+        
+        // Reset timer bar animation
+        const bar = document.getElementById('timer-fill');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        setTimeout(() => {
+            bar.style.transition = 'width 3s linear';
+            bar.style.width = '0%';
+        }, 10);
+
+        // Timer logic
+        if(gameTimer) clearTimeout(gameTimer);
+        gameTimer = setTimeout(() => {
+            answerGame(null); // Time out
+        }, 3000);
+    }
+
+    function answerGame(userSaidPositive) {
+        clearTimeout(gameTimer);
+        
+        // Logic: Is it Good (positive) or Bad (negative)?
+        // If user clicked Good (true) and item is positive -> Correct
+        // If user clicked Bad (false) and item is negative -> Correct
+        
+        let correct = false;
+        if(userSaidPositive === true && currentItem.type === 'positive') correct = true;
+        if(userSaidPositive === false && currentItem.type === 'negative') correct = true;
+
+        if(correct) {
+            gameScore += 10;
+            document.getElementById('score').innerText = gameScore;
+        } else {
+            // Shake effect or red flash could go here
+        }
+
+        // Remove used item (optional, or keep infinite with random)
+        // Let's keep it random infinite for "speed run" feel, 
+        // but for this lesson lets cycle through list once
+        gameItems = gameItems.filter(i => i !== currentItem);
+        nextGameItem();
+    }
+
+    function endGame() {
+        document.getElementById('game-ui').innerHTML = `
+            <h2>Game Over!</h2>
+            <p>Final Score: ${gameScore}</p>
+            <button class="action-btn" onclick="location.reload()">Play Again</button>
+        `;
+    }
+
+
+    // --- Initialization ---
+    window.onload = function() {
+        initSorter();
+        initDef();
+        initReading1();
+        initReading2();
+        renderScenario();
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Life & Home Vocabulary</title>
+    <style>
+        :root {
+            --primary: #2563eb; /* Royal Blue */
+            --primary-dark: #1e40af;
+            --secondary: #059669; /* Emerald */
+            --accent: #d97706; /* Amber */
+            --bg: #f8fafc; /* Slate 50 */
+            --text: #1e293b; /* Slate 800 */
+            --card-bg: #ffffff;
+            --danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; }
+        h2 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .subtitle { opacity: 0.9; font-weight: 300; margin-top: 0.5rem; }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Vocab List Styling --- */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .vocab-table th {
+            text-align: left;
+            background: #f1f5f9;
+            padding: 1rem;
+            color: var(--primary);
+        }
+        .vocab-table td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem;
+            vertical-align: top;
+        }
+        .vocab-table tr:hover { background: #f8fafc; }
+        .cz-word { font-weight: bold; color: var(--secondary); }
+        .ex-sentence { font-style: italic; color: #64748b; font-size: 0.9rem; margin-top: 0.25rem; display: block; }
+        .word-cell { font-weight: bold; color: var(--primary); min-width: 120px; }
+
+        /* --- Exercise Utilities --- */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-check { background: var(--secondary); width: 100%; }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        /* --- Match Game --- */
+        .match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .match-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .match-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .match-card:hover { border-color: var(--primary); background: #eff6ff; }
+        .match-card.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.02); }
+        .match-card.matched { background: #dcfce7; color: var(--secondary); border-color: var(--secondary); opacity: 0.7; pointer-events: none; }
+
+        /* --- Gap Fill --- */
+        .fill-item {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        select {
+            padding: 0.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.3rem;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+        select.correct { border-color: var(--secondary); background: #ecfdf5; color: var(--secondary); font-weight: bold; }
+        select.incorrect { border-color: var(--danger); background: #fef2f2; }
+
+        /* --- Definition Quiz --- */
+        .quiz-q { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .quiz-opt {
+            display: inline-block;
+            margin: 0.25rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
+        .quiz-opt:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .quiz-opt.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .quiz-opt.correct { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .quiz-opt.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+
+        @media (max-width: 600px) {
+            .match-grid { grid-template-columns: 1fr; }
+            .vocab-table th:nth-child(3), .vocab-table td:nth-child(3) { display: none; } /* Hide definition on mobile */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>My Life & Home</h1>
+        <div class="subtitle">Vocabulary Builder | B1 Intermediate</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. Vocabulary List -->
+    <section>
+        <h2>📚 Vocabulary List</h2>
+        <div class="category-tabs">
+            <button class="tab-btn active" id="tab-rooms" onclick="filterVocab('rooms')">Rooms</button>
+            <button class="tab-btn" id="tab-items" onclick="filterVocab('items')">Household Items</button>
+            <button class="tab-btn" id="tab-chores" onclick="filterVocab('chores')">Chores</button>
+            <button class="tab-btn" id="tab-life" onclick="filterVocab('life')">Life & Phrases</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="vocab-table">
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>Czech</th>
+                        <th>Definition / Example</th>
+                    </tr>
+                </thead>
+                <tbody id="vocab-body">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 2. Match Up Game -->
+    <section>
+        <h2>🧩 Match Up: Rooms & Items</h2>
+        <p>Tap an English word (blue), then tap the correct Czech translation.</p>
+        <div class="match-grid">
+            <div class="match-col" id="col-eng"></div>
+            <div class="match-col" id="col-cz"></div>
+        </div>
+        <div id="match-feedback" class="feedback"></div>
+        <button class="btn btn-reset" style="background:transparent; color:#666; font-size:0.9rem; text-decoration:underline; margin-top:0;" onclick="initMatchGame()">Reset Game</button>
+    </section>
+
+    <!-- 3. Context Gap Fill -->
+    <section>
+        <h2>✍️ Complete the Sentence</h2>
+        <p>Choose the correct phrasal verb or life phrase to complete the sentence.</p>
+        
+        <div class="fill-item">
+            1. I take the train to London every day. I <select class="gap-select" data-ans="commute">
+                <option value="">---</option>
+                <option value="commute">commute</option>
+                <option value="head out">head out</option>
+                <option value="rent">rent</option>
+            </select> for 45 minutes.
+        </div>
+
+        <div class="fill-item">
+            2. It's Friday night! Let's just sit on the sofa and <select class="gap-select" data-ans="chill out">
+                <option value="">---</option>
+                <option value="move in">move in</option>
+                <option value="chill out">chill out</option>
+                <option value="host">host</option>
+            </select> with a movie.
+        </div>
+
+        <div class="fill-item">
+            3. I didn't set my alarm because I wanted to <select class="gap-select" data-ans="sleep in">
+                <option value="">---</option>
+                <option value="sleep in">sleep in</option>
+                <option value="catch up on">catch up on</option>
+                <option value="get along with">get along with</option>
+            </select> this morning.
+        </div>
+
+        <div class="fill-item">
+            4. My new <select class="gap-select" data-ans="roommate">
+                <option value="">---</option>
+                <option value="neighborhood">neighborhood</option>
+                <option value="landlord">landlord</option>
+                <option value="roommate">roommate</option>
+            </select> is very messy. He never washes his dishes!
+        </div>
+
+        <div class="fill-item">
+            5. We need to buy paint because we are going to <select class="gap-select" data-ans="renovate">
+                <option value="">---</option>
+                <option value="renovate">renovate</option>
+                <option value="rent">rent</option>
+                <option value="host">host</option>
+            </select> the kitchen.
+        </div>
+
+        <button class="btn btn-check" onclick="checkGapFill()">Check Answers</button>
+        <div id="gap-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 4. Definition Quiz -->
+    <section>
+        <h2>🧠 What's the Definition?</h2>
+        <p>Read the definition and select the correct word.</p>
+        <div id="quiz-container"></div>
+        <button class="btn btn-check" onclick="checkQuiz()">Check Quiz</button>
+        <div id="quiz-feedback" class="feedback"></div>
+    </section>
+
+</div>
+
+<script>
+    // --- DATA ---
+    const vocabData = [
+        // Rooms
+        { cat: 'rooms', word: 'Attic', cz: 'Půda', def: 'Space under the roof for storage.', ex: 'We keep old boxes in the attic.' },
+        { cat: 'rooms', word: 'Basement', cz: 'Sklep', def: 'Floor of a building below ground level.', ex: 'The washing machine is in the basement.' },
+        { cat: 'rooms', word: 'Driveway', cz: 'Příjezdová cesta', def: 'Short road leading to a house.', ex: 'Park your car on the driveway.' },
+        { cat: 'rooms', word: 'Hallway', cz: 'Chodba', def: 'Passage in a building.', ex: 'Leave your shoes in the hallway.' },
+        { cat: 'rooms', word: 'Landing', cz: 'Mezipatro', def: 'Level area at the top of stairs.', ex: 'I tripped on the landing.' },
+        { cat: 'rooms', word: 'Pantry', cz: 'Spíž', def: 'Small room for food storage.', ex: 'Check the pantry for pasta.' },
+        { cat: 'rooms', word: 'Spare room', cz: 'Pokoj pro hosty', def: 'Extra bedroom for guests.', ex: 'You can sleep in the spare room.' },
+        { cat: 'rooms', word: 'Utility room', cz: 'Technická místnost', def: 'Room for appliances like washing machines.', ex: 'The laundry is in the utility room.' },
+        
+        // Items
+        { cat: 'items', word: 'Appliance', cz: 'Spotřebič', def: 'Machine like a fridge or stove.', ex: 'The kitchen has modern appliances.' },
+        { cat: 'items', word: 'Chest of drawers', cz: 'Komoda', def: 'Furniture with drawers for clothes.', ex: 'My socks are in the chest of drawers.' },
+        { cat: 'items', word: 'Curtains', cz: 'Závěsy', def: 'Cloth used to cover windows.', ex: 'Close the curtains at night.' },
+        { cat: 'items', word: 'Duvet', cz: 'Peřina', def: 'Warm bed cover.', ex: 'It is cold, I need a thick duvet.' },
+        { cat: 'items', word: 'Fixture', cz: 'Pevná součást', def: 'Fixed item like a sink or light.', ex: 'The sinks are fixtures.' },
+        { cat: 'items', word: 'Kettle', cz: 'Rychlovarná konvice', def: 'Used to boil water.', ex: 'Put the kettle on for tea.' },
+        { cat: 'items', word: 'Mirror', cz: 'Zrcadlo', def: 'Glass surface that reflects images.', ex: 'Check your hair in the mirror.' },
+        { cat: 'items', word: 'Radiator', cz: 'Topení', def: 'Metal device to heat a room.', ex: 'Sit by the radiator to get warm.' },
+        { cat: 'items', word: 'Shelf', cz: 'Police', def: 'Flat board to hold objects.', ex: 'Put the book on the top shelf.' },
+        { cat: 'items', word: 'Wardrobe', cz: 'Šatní skříň', def: 'Tall cupboard for hanging clothes.', ex: 'My wardrobe is full of coats.' },
+
+        // Chores
+        { cat: 'chores', word: 'To vacuum', cz: 'Luxovat', def: 'To clean floor with suction.', ex: 'Vacuum the living room.' },
+        { cat: 'chores', word: 'To mop', cz: 'Vytírat', def: 'To wash floor with water.', ex: 'I mopped the kitchen floor.' },
+        { cat: 'chores', word: 'To dust', cz: 'Utírat prach', def: 'To remove fine powder/dirt.', ex: 'Please dust the TV stand.' },
+        { cat: 'chores', word: 'To do laundry', cz: 'Prát prádlo', def: 'To wash clothes.', ex: 'I do laundry every Sunday.' },
+        { cat: 'chores', word: 'To iron', cz: 'Žehlit', def: 'To make clothes smooth with heat.', ex: 'I hate ironing shirts.' },
+        { cat: 'chores', word: 'To mow lawn', cz: 'Séct trávník', def: 'To cut the grass.', ex: 'Mow the lawn this weekend.' },
+        { cat: 'chores', word: 'To clear table', cz: 'Sklidit ze stolu', def: 'Remove dishes after eating.', ex: 'Help me clear the table.' },
+        { cat: 'chores', word: 'To take out trash', cz: 'Vynést koš', def: 'Move waste outside.', ex: 'Take out the rubbish tonight.' },
+        { cat: 'chores', word: 'To scrub', cz: 'Drhnout', def: 'Rub hard to clean.', ex: 'Scrub the bathtub.' },
+        { cat: 'chores', word: 'To tidy up', cz: 'Uklidit', def: 'Make a room neat.', ex: 'Tidy up your room.' },
+
+        // Life
+        { cat: 'life', word: 'To commute', cz: 'Dojíždět', def: 'Travel to work/school daily.', ex: 'I commute by train.' },
+        { cat: 'life', word: 'To head out', cz: 'Vyrazit ven', def: 'To leave a place.', ex: 'I am heading out now.' },
+        { cat: 'life', word: 'To chill out', cz: 'Relaxovat', def: 'To relax completely.', ex: 'Let\'s chill out on the sofa.' },
+        { cat: 'life', word: 'To sleep in', cz: 'Přispat si', def: 'Sleep later than usual.', ex: 'It is Saturday, I will sleep in.' },
+        { cat: 'life', word: 'To catch up on', cz: 'Dohnat', def: 'Do something you missed.', ex: 'I need to catch up on sleep.' },
+        { cat: 'life', word: 'To host', cz: 'Hostit', def: 'Provide space for a party/event.', ex: 'We will host a BBQ.' },
+        { cat: 'life', word: 'To move in', cz: 'Nastěhovat se', def: 'Start living in a new place.', ex: 'I move in next month.' },
+        { cat: 'life', word: 'To renovate', cz: 'Renovovat', def: 'Repair and improve a building.', ex: 'They are renovating the kitchen.' },
+        { cat: 'life', word: 'To rent', cz: 'Pronajmout si', def: 'Pay money to live somewhere.', ex: 'I rent a small flat.' },
+        { cat: 'life', word: 'To get along with', cz: 'Vycházet s', def: 'Have a good relationship.', ex: 'I get along with my sister.' },
+        { cat: 'life', word: 'Neighborhood', cz: 'Sousedství', def: 'Area around your home.', ex: 'This is a quiet neighborhood.' },
+        { cat: 'life', word: 'Roommate', cz: 'Spolubydlící', def: 'Person you share a home with.', ex: 'My roommate is messy.' }
+    ];
+
+    // --- 1. POPULATE TABLE ---
+    function filterVocab(category) {
+        // Update tabs without relying on event.target
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.getElementById('tab-' + category);
+        if(activeBtn) activeBtn.classList.add('active');
+
+        const tbody = document.getElementById('vocab-body');
+        tbody.innerHTML = '';
+        
+        const filtered = vocabData.filter(v => v.cat === category);
+        
+        filtered.forEach(v => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="word-cell">${v.word}</td>
+                <td class="cz-word">${v.cz}</td>
+                <td>
+                    <div>${v.def}</div>
+                    <span class="ex-sentence">"${v.ex}"</span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- 2. MATCH GAME LOGIC ---
+    let selectedEng = null;
+    
+    function initMatchGame() {
+        // Select 8 random items from Rooms or Items category for variety
+        const gameItems = vocabData.filter(v => v.cat === 'rooms' || v.cat === 'items')
+                                   .sort(() => 0.5 - Math.random())
+                                   .slice(0, 8);
+        
+        const colEng = document.getElementById('col-eng');
+        const colCz = document.getElementById('col-cz');
+        const fb = document.getElementById('match-feedback');
+        
+        colEng.innerHTML = '';
+        colCz.innerHTML = '';
+        fb.className = 'feedback';
+        fb.style.display = 'none';
+
+        // Create English Cards
+        const engList = [...gameItems].sort(() => 0.5 - Math.random());
+        engList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card';
+            el.textContent = item.word;
+            el.onclick = () => selectEng(el, item.word);
+            colEng.appendChild(el);
+        });
+
+        // Create Czech Cards
+        const czList = [...gameItems].sort(() => 0.5 - Math.random());
+        czList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card';
+            el.textContent = item.cz;
+            el.dataset.match = item.word; // Store match key
+            el.onclick = () => selectCz(el);
+            colCz.appendChild(el);
+        });
+    }
+
+    function selectEng(el, word) {
+        if(el.classList.contains('matched')) return;
+        
+        // Deselect others
+        document.querySelectorAll('#col-eng .match-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedEng = { el: el, word: word };
+    }
+
+    function selectCz(el) {
+        if(!selectedEng || el.classList.contains('matched')) return;
+        
+        if(el.dataset.match === selectedEng.word) {
+            // Match
+            el.classList.add('matched');
+            selectedEng.el.classList.add('matched');
+            selectedEng.el.classList.remove('selected');
+            selectedEng = null;
+            checkMatchWin();
+        } else {
+            // Error
+            el.style.background = '#fee2e2';
+            setTimeout(() => el.style.background = 'white', 500);
+        }
+    }
+
+    function checkMatchWin() {
+        const remaining = document.querySelectorAll('#col-eng .match-card:not(.matched)');
+        if(remaining.length === 0) {
+            const fb = document.getElementById('match-feedback');
+            fb.textContent = "Great job! You matched all words.";
+            fb.className = "feedback success";
+        }
+    }
+
+    // --- 3. GAP FILL LOGIC ---
+    function checkGapFill() {
+        let score = 0;
+        const selects = document.querySelectorAll('.gap-select');
+        selects.forEach(sel => {
+            if(sel.value === sel.dataset.ans) {
+                sel.className = 'gap-select correct';
+                score++;
+            } else {
+                sel.className = 'gap-select incorrect';
+            }
+        });
+        
+        const fb = document.getElementById('gap-feedback');
+        fb.textContent = score === 5 ? "Perfect! 5/5" : `You got ${score}/5. Try again.`;
+        fb.className = score === 5 ? "feedback success" : "feedback error";
+    }
+
+    // --- 4. QUIZ LOGIC ---
+    function initQuiz() {
+        const container = document.getElementById('quiz-container');
+        // Pick 5 random words from Chores or Life
+        const pool = vocabData.filter(v => v.cat === 'chores' || v.cat === 'life').sort(() => 0.5 - Math.random()).slice(0, 5);
+        
+        pool.forEach((item, index) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'quiz-q';
+            
+            // Create distractors
+            const distractors = vocabData.filter(v => v.cat === item.cat && v.word !== item.word)
+                                         .sort(() => 0.5 - Math.random())
+                                         .slice(0, 2)
+                                         .map(v => v.word);
+            
+            const options = [item.word, ...distractors].sort(() => 0.5 - Math.random());
+            
+            let optsHTML = '';
+            options.forEach(opt => {
+                optsHTML += `<span class="quiz-opt" onclick="selectQuizOpt(this)" data-val="${opt}">${opt}</span>`;
+            });
+
+            qDiv.innerHTML = `
+                <p><strong>${index + 1}.</strong> ${item.def}</p>
+                <div class="opts-container" data-ans="${item.word}">
+                    ${optsHTML}
+                </div>
+            `;
+            container.appendChild(qDiv);
+        });
+    }
+
+    function selectQuizOpt(el) {
+        const container = el.parentElement;
+        // Deselect siblings
+        Array.from(container.children).forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function checkQuiz() {
+        let score = 0;
+        const questions = document.querySelectorAll('.opts-container');
+        
+        questions.forEach(q => {
+            const ans = q.dataset.ans;
+            const selected = q.querySelector('.selected');
+            
+            // Clear previous grading
+            Array.from(q.children).forEach(c => c.classList.remove('correct', 'wrong'));
+
+            if(selected) {
+                if(selected.dataset.val === ans) {
+                    selected.classList.add('correct');
+                    score++;
+                } else {
+                    selected.classList.add('wrong');
+                    // Show correct
+                    Array.from(q.children).find(c => c.dataset.val === ans).classList.add('correct');
+                }
+            }
+        });
+
+        const fb = document.getElementById('quiz-feedback');
+        fb.textContent = score === 5 ? "Excellent! 5/5" : `You got ${score}/5.`;
+        fb.className = score === 5 ? "feedback success" : "feedback error";
+    }
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+        // Load initial tab
+        filterVocab('rooms');
+        initMatchGame();
+        initQuiz();
+    };
+
+</script>
+
+</body>
+</html>

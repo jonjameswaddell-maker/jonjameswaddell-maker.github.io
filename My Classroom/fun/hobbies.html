@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hobbies & Interests</title>
+    <style>
+        :root {
+            --primary: #ea580c; /* Vibrant Orange */
+            --primary-dark: #c2410c;
+            --secondary: #475569; /* Slate */
+            --bg: #fff7ed; /* Very light warm orange/beige */
+            --card-bg: #ffffff;
+            --success: #16a34a;
+            --error: #dc2626;
+            --text-main: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* --- Navigation --- */
+        .nav-scroller {
+            overflow-x: auto;
+            white-space: nowrap;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tabs {
+            display: inline-flex;
+            gap: 10px;
+            list-style: none;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid #fed7aa;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary);
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* --- Sections --- */
+        .section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #fed7aa;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #fed7aa;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            margin: 15px 0 10px 0;
+            color: var(--text-main);
+        }
+
+        /* --- Components: Inputs & Buttons --- */
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        button.action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        button.secondary-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: none;
+        }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        /* --- Activity: Vocab Sorter --- */
+        .sorter-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .sorter-area { grid-template-columns: 1fr; }
+        }
+
+        .drop-zone {
+            background: #fff7ed;
+            border: 2px dashed #fdba74;
+            border-radius: 8px;
+            min-height: 200px;
+            padding: 10px;
+        }
+
+        .drop-zone h4 { text-align: center; margin-bottom: 10px; }
+        .drop-zone.positive { border-color: var(--success); }
+        .drop-zone.negative { border-color: var(--primary); }
+
+        .vocab-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff7ed;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+
+        .vocab-item {
+            background: white;
+            border: 1px solid #fed7aa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .vocab-item.selected {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* --- Activity: Definition Match --- */
+        .match-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #fff7ed;
+            border-radius: 6px;
+        }
+        
+        .match-row select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            max-width: 150px;
+        }
+
+        /* --- Readings --- */
+        .reading-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #334155;
+            padding: 20px;
+            background: #fff;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .question-block {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .options label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        /* --- Game Section --- */
+        .game-screen {
+            text-align: center;
+            padding: 20px;
+        }
+        .timer-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .timer-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--primary);
+            transition: width 1s linear;
+        }
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .game-btn {
+            width: 45%;
+            padding: 20px;
+            margin: 10px 2%;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-green { background: var(--success); }
+        .btn-red { background: #3b82f6; } /* Blue for Relaxing */
+
+        /* Images */
+        .img-header {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Hobbies & Free Time</h1>
+        <p>B1 Intermediate ESL Lesson</p>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav-scroller">
+        <ul class="nav-tabs" id="navTabs">
+            <li><button class="nav-btn active" onclick="showTab('warmup')">Warm-Up</button></li>
+            <li><button class="nav-btn" onclick="showTab('vocab1')">Sorter</button></li>
+            <li><button class="nav-btn" onclick="showTab('vocab2')">Definitions</button></li>
+            <li><button class="nav-btn" onclick="showTab('reading1')">Reading 1</button></li>
+            <li><button class="nav-btn" onclick="showTab('reading2')">Reading 2</button></li>
+            <li><button class="nav-btn" onclick="showTab('fun')">Hobby Doctor</button></li>
+            <li><button class="nav-btn" onclick="showTab('game')">Speed Game</button></li>
+        </ul>
+    </div>
+
+    <!-- 1. Warm-up Section -->
+    <div id="warmup" class="section active">
+        <div class="card">
+            <h2>Warm-Up Discussion</h2>
+            <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&q=80&w=1000" alt="Hobbies Collage" class="img-header">
+            <p style="margin-bottom: 15px;">Think about your free time. Answer the following questions:</p>
+            
+            <h3>1. How much free time do you usually have per week?</h3>
+            <textarea id="wu1" rows="2" placeholder="I usually have..."></textarea>
+            
+            <h3>2. What is a hobby you have always wanted to try? Why?</h3>
+            <textarea id="wu2" rows="2" placeholder="I have always wanted to try..."></textarea>
+
+            <h3>3. Do you prefer indoor hobbies or outdoor hobbies? Why?</h3>
+            <textarea id="wu3" rows="2" placeholder="I prefer... because..."></textarea>
+
+            <button class="action-btn" onclick="checkWarmup()">Submit Answers</button>
+            <div id="wu-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 2. Vocab Sorter -->
+    <div id="vocab1" class="section">
+        <div class="card">
+            <h2>Vocabulary Sorter</h2>
+            <p>Tap a hobby, then tap the box where it belongs. Is it <strong>Creative</strong> (Making something) or <strong>Physical</strong> (Moving body)?</p>
+            
+            <div class="vocab-pool" id="vocabPool">
+                <!-- JS will populate this -->
+            </div>
+
+            <div class="sorter-area">
+                <div class="drop-zone positive" onclick="moveToBox('creative')">
+                    <h4>🎨 Creative</h4>
+                    <div id="box-creative"></div>
+                </div>
+                <div class="drop-zone negative" onclick="moveToBox('physical')">
+                    <h4>🏃 Physical</h4>
+                    <div id="box-physical"></div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                 <button class="action-btn" onclick="checkSorter()">Check Answers</button>
+                 <button class="secondary-btn" onclick="resetSorter()">Reset</button>
+            </div>
+            <div id="sorter-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 3. Vocab Drill -->
+    <div id="vocab2" class="section">
+        <div class="card">
+            <h2>Match the Definitions</h2>
+            <p>Select the correct word for each definition.</p>
+            <div id="definition-container">
+                <!-- JS Populated -->
+            </div>
+            <button class="action-btn" onclick="checkDefinitions()">Check Definitions</button>
+            <div id="def-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 4. Reading 1 -->
+    <div id="reading1" class="section">
+        <div class="card">
+            <h2>Reading: The Digital Detox</h2>
+            <img src="https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?auto=format&fit=crop&q=80&w=1000" alt="Analog Hobby" class="img-header">
+            
+            <div class="reading-text">
+                <p>In a world dominated by screens, many people are returning to "analog" hobbies. Activities like <strong>knitting</strong>, pottery, and <strong>gardening</strong> are becoming popular again. These are often called "Digital Detox" hobbies because they force you to put down your phone.</p>
+                <br>
+                <p>Psychologists say that working with your hands reduces stress. When you <strong>accomplish</strong> something tangible, like baking a loaf of bread or painting a canvas, your brain releases dopamine. Unlike video games, which provide instant gratification, these <strong>pastimes</strong> require <strong>patience</strong> and dedication. Becoming an <strong>amateur</strong> photographer or carpenter gives people a sense of control in a chaotic world.</p>
+            </div>
+
+            <h3>Comprehension Check</h3>
+            <div id="quiz-r1"></div>
+            <button class="action-btn" onclick="checkReading1()">Check Answers</button>
+            <div id="r1-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 5. Reading 2 -->
+    <div id="reading2" class="section">
+        <div class="card">
+            <h2>Cultural Corner: Global Pastimes</h2>
+            <div class="reading-text">
+                <p>How we relax depends on where we live. In <strong>South Korea</strong>, 'PC Bangs' (gaming cafes) are a huge part of teenage culture. Professional gamers are treated like celebrities.</p>
+                <br>
+                <p>In the <strong>UK</strong>, gardening is a national obsession. Many people have "allotments"—small patches of land away from their house where they grow vegetables. It is very common to discuss the weather and plants.</p>
+                <br>
+                <p>In <strong>Brazil</strong>, 'Futevôlei' (Footvolley) is popular on the beaches. It combines football and volleyball. You cannot use your hands! It requires incredible skill and <strong>coordination</strong>.</p>
+            </div>
+
+            <h3>True or False?</h3>
+            <div id="quiz-r2"></div>
+            <button class="action-btn" onclick="checkReading2()">Check Answers</button>
+            <div id="r2-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 6. Fun Task -->
+    <div id="fun" class="section">
+        <div class="card">
+            <h2>The Hobby Doctor</h2>
+            <p>Read the person's complaint. As the expert, prescribe them the best hobby!</p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <div id="doctor-scenario">
+                <!-- JS Populated -->
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="secondary-btn" onclick="nextScenario()">Next Patient</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Game -->
+    <div id="game" class="section">
+        <div class="card game-screen">
+            <h2>Active or Relaxing?</h2>
+            <p>A hobby will appear. Is it ACTIVE (Energy) or RELAXING (Calm)? Be fast!</p>
+            <br>
+            <button class="action-btn" id="start-game-btn" onclick="startGame()">Start Game</button>
+            
+            <div id="game-ui" style="display:none;">
+                <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+                <div class="score-display">Score: <span id="score">0</span></div>
+                
+                <h2 id="game-prompt" style="font-size: 2rem; margin: 30px 0;">Prompt</h2>
+                
+                <div>
+                    <button class="game-btn btn-green" onclick="answerGame('active')">ACTIVE 🏃</button>
+                    <button class="game-btn btn-red" onclick="answerGame('relaxing')">RELAXING 🧘</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Data ---
+    const vocabList = [
+        { word: "Painting", type: "creative" },
+        { word: "Hiking", type: "physical" },
+        { word: "Knitting", type: "creative" },
+        { word: "Football", type: "physical" },
+        { word: "Photography", type: "creative" },
+        { word: "Swimming", type: "physical" },
+        { word: "Pottery", type: "creative" },
+        { word: "Dancing", type: "physical" },
+        { word: "Writing", type: "creative" },
+        { word: "Boxing", type: "physical" },
+        { word: "Cooking", type: "creative" },
+        { word: "Yoga", type: "physical" },
+        { word: "Origami", type: "creative" },
+        { word: "Rock Climbing", type: "physical" }
+    ];
+
+    const definitions = [
+        { word: "Leisure", def: "Free time when you are not working." },
+        { word: "Amateur", def: "Someone who does an activity for pleasure, not as a job." },
+        { word: "Pastime", def: "An activity that you enjoy doing in your spare time." },
+        { word: "Equipment", def: "The necessary items for a particular purpose." },
+        { word: "Collect", def: "To bring or gather things together (e.g., stamps, coins)." },
+        { word: "Skill", def: "The ability to do something well." }
+    ];
+
+    const reading1Questions = [
+        { q: "What is a 'Digital Detox' hobby?", options: ["Using a tablet", "Avoiding screens", "Coding apps"], a: 1 },
+        { q: "Why are these hobbies popular?", options: ["They are cheap", "They reduce stress", "They are fast"], a: 1 },
+        { q: "What does working with your hands release?", options: ["Adrenaline", "Dopamine", "Cortisol"], a: 1 },
+        { q: "What do analog hobbies require?", options: ["Patience", "Electricity", "Big muscles"], a: 0 }
+    ];
+
+    const reading2Questions = [
+        { q: "In Korea, gamers are very famous.", a: "True" },
+        { q: "British people grow vegetables in their living rooms.", a: "False" },
+        { q: "Footvolley allows you to use your hands.", a: "False" },
+        { q: "An 'allotment' is a type of sport.", a: "False" }
+    ];
+
+    const scenarios = [
+        { text: "I am stressed at work and I need to punch something!", opts: ["Boxing", "Chess", "Reading"] },
+        { text: "I want to make something beautiful for my house.", opts: ["Pottery", "Running", "Gaming"] },
+        { text: "I want to be outside but I hate running.", opts: ["Gardening", "Gym", "Watching TV"] },
+        { text: "I have no money but I want to get fit.", opts: ["Jogging", "Golf", "Scuba Diving"] },
+        { text: "I want to meet new people and I love music.", opts: ["Choir/Band", "Solitaire", "Fishing"] }
+    ];
+
+    const gameData = [
+        { word: "Rugby", type: "active" },
+        { word: "Meditation", type: "relaxing" },
+        { word: "Reading", type: "relaxing" },
+        { word: "Sprinting", type: "active" },
+        { word: "Sleeping", type: "relaxing" },
+        { word: "Tennis", type: "active" },
+        { word: "Bird Watching", type: "relaxing" },
+        { word: "Karate", type: "active" },
+        { word: "Sunbathing", type: "relaxing" },
+        { word: "Cycling", type: "active" }
+    ];
+
+    // --- State ---
+    let selectedWord = null;
+    let selectedElement = null;
+    let gameScore = 0;
+    let gameTimer = null;
+    let scenarioIndex = 0;
+    let gameItems = [];
+    let currentItem = null;
+
+    // --- Navigation ---
+    function showTab(tabId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        
+        // Highlight button
+        const btns = document.querySelectorAll('.nav-btn');
+        btns.forEach(btn => {
+            if(btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active');
+        });
+    }
+
+    // --- Warm Up ---
+    function checkWarmup() {
+        const w1 = document.getElementById('wu1').value;
+        const w2 = document.getElementById('wu2').value;
+        const w3 = document.getElementById('wu3').value;
+        const fb = document.getElementById('wu-feedback');
+
+        if(w1.length > 3 && w2.length > 3 && w3.length > 3) {
+            fb.textContent = "Interesting answers! Share them with the class.";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = "Try to write a bit more detail.";
+            fb.className = "feedback error";
+        }
+    }
+
+    // --- Vocab Sorter ---
+    function initSorter() {
+        const pool = document.getElementById('vocabPool');
+        pool.innerHTML = '';
+        document.getElementById('box-creative').innerHTML = '';
+        document.getElementById('box-physical').innerHTML = '';
+        
+        // Shuffle
+        vocabList.sort(() => Math.random() - 0.5);
+
+        vocabList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vocab-item';
+            div.textContent = item.word;
+            div.dataset.type = item.type;
+            div.onclick = function() { selectWord(this); };
+            pool.appendChild(div);
+        });
+    }
+
+    function selectWord(el) {
+        if(selectedElement) selectedElement.classList.remove('selected');
+        selectedElement = el;
+        selectedElement.classList.add('selected');
+    }
+
+    function moveToBox(type) {
+        if(!selectedElement) return;
+        
+        const targetBox = document.getElementById(`box-${type}`);
+        const clone = selectedElement.cloneNode(true);
+        clone.classList.remove('selected');
+        clone.style.margin = '5px';
+        clone.style.display = 'inline-block';
+        clone.onclick = null;
+        
+        targetBox.appendChild(clone);
+        selectedElement.remove();
+        selectedElement = null;
+    }
+
+    function checkSorter() {
+        const creative = document.getElementById('box-creative').children;
+        const physical = document.getElementById('box-physical').children;
+        let errors = 0;
+
+        for(let el of creative) { if(el.dataset.type !== 'creative') errors++; }
+        for(let el of physical) { if(el.dataset.type !== 'physical') errors++; }
+
+        const fb = document.getElementById('sorter-feedback');
+        if(document.getElementById('vocabPool').children.length > 0) {
+            fb.textContent = "Finish sorting all words first!";
+            fb.className = "feedback error";
+        } else if(errors === 0) {
+            fb.textContent = "Perfect! All hobbies sorted correctly.";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = `You have ${errors} mistakes. Check again.`;
+            fb.className = "feedback error";
+        }
+    }
+
+    function resetSorter() {
+        initSorter();
+        document.getElementById('sorter-feedback').style.display = 'none';
+    }
+
+    // --- Definitions ---
+    function initDef() {
+        const container = document.getElementById('definition-container');
+        let html = '';
+        let options = '<option value="">--Select--</option>';
+        const shuffledWords = [...definitions].sort(() => Math.random() - 0.5);
+        shuffledWords.forEach(d => options += `<option value="${d.word}">${d.word}</option>`);
+
+        definitions.forEach((item, index) => {
+            html += `
+            <div class="match-row">
+                <span>${item.def}</span>
+                <select id="def-${index}" data-answer="${item.word}">${options}</select>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkDefinitions() {
+        let correct = 0;
+        definitions.forEach((item, index) => {
+            const select = document.getElementById(`def-${index}`);
+            if(select.value === item.word) {
+                select.style.borderColor = "var(--success)";
+                select.style.borderWidth = "2px";
+                correct++;
+            } else {
+                select.style.borderColor = "var(--error)";
+                select.style.borderWidth = "2px";
+            }
+        });
+        
+        const fb = document.getElementById('def-feedback');
+        fb.textContent = `You got ${correct}/${definitions.length} correct.`;
+        fb.className = correct === definitions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Reading 1 Quiz ---
+    function initReading1() {
+        const container = document.getElementById('quiz-r1');
+        let html = '';
+        reading1Questions.forEach((q, idx) => {
+            html += `<div class="question-block"><p><strong>${idx+1}. ${q.q}</strong></p><div class="options">`;
+            q.options.forEach((opt, oIdx) => {
+                html += `<label><input type="radio" name="r1q${idx}" value="${oIdx}"> ${opt}</label>`;
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkReading1() {
+        let score = 0;
+        reading1Questions.forEach((q, idx) => {
+            const selected = document.querySelector(`input[name="r1q${idx}"]:checked`);
+            if(selected && parseInt(selected.value) === q.a) score++;
+        });
+        const fb = document.getElementById('r1-feedback');
+        fb.textContent = `Score: ${score}/${reading1Questions.length}`;
+        fb.className = score === reading1Questions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Reading 2 Quiz ---
+    function initReading2() {
+        const container = document.getElementById('quiz-r2');
+        let html = '';
+        reading2Questions.forEach((q, idx) => {
+            html += `<div class="question-block"><div style="display:flex; justify-content:space-between;">
+                <span>${q.q}</span>
+                <div>
+                    <select id="r2q${idx}">
+                        <option value="">?</option>
+                        <option value="True">True</option>
+                        <option value="False">False</option>
+                    </select>
+                </div>
+            </div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkReading2() {
+        let score = 0;
+        reading2Questions.forEach((q, idx) => {
+            const val = document.getElementById(`r2q${idx}`).value;
+            if(val === q.a) score++;
+        });
+        const fb = document.getElementById('r2-feedback');
+        fb.textContent = `Score: ${score}/${reading2Questions.length}`;
+        fb.className = score === reading2Questions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Hobby Doctor ---
+    function renderScenario() {
+        const container = document.getElementById('doctor-scenario');
+        if(scenarioIndex >= scenarios.length) scenarioIndex = 0;
+        
+        const current = scenarios[scenarioIndex];
+        
+        container.innerHTML = `
+            <h3 style="text-align:center;">Patient #${scenarioIndex + 1}</h3>
+            <p style="font-size: 1.2rem; text-align:center; margin: 20px 0;">"${current.text}"</p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="action-btn" onclick="alert('Great recommendation!')">Prescribe ${current.opts[0]}</button>
+                <button class="action-btn" style="background:#0284c7" onclick="alert('Interesting choice.')">Prescribe ${current.opts[1]}</button>
+                <button class="action-btn" style="background:#7c3aed" onclick="alert('They might like that!')">Prescribe ${current.opts[2]}</button>
+            </div>
+        `;
+    }
+
+    function nextScenario() {
+        scenarioIndex++;
+        renderScenario();
+    }
+
+    // --- Game Logic ---
+    function startGame() {
+        gameItems = [...gameData];
+        document.getElementById('start-game-btn').style.display = 'none';
+        document.getElementById('game-ui').style.display = 'block';
+        gameScore = 0;
+        document.getElementById('score').innerText = gameScore;
+        nextGameItem();
+    }
+
+    function nextGameItem() {
+        if(gameItems.length === 0) {
+            endGame();
+            return;
+        }
+        
+        const idx = Math.floor(Math.random() * gameItems.length);
+        currentItem = gameItems[idx];
+        document.getElementById('game-prompt').innerText = currentItem.word;
+        
+        // Timer Animation
+        const bar = document.getElementById('timer-fill');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        setTimeout(() => {
+            bar.style.transition = 'width 3s linear';
+            bar.style.width = '0%';
+        }, 10);
+
+        if(gameTimer) clearTimeout(gameTimer);
+        gameTimer = setTimeout(() => {
+            answerGame(null);
+        }, 3000);
+    }
+
+    function answerGame(choice) {
+        clearTimeout(gameTimer);
+        
+        let correct = false;
+        if(choice === currentItem.type) correct = true;
+
+        if(correct) {
+            gameScore += 10;
+            document.getElementById('score').innerText = gameScore;
+        }
+
+        gameItems = gameItems.filter(i => i !== currentItem);
+        nextGameItem();
+    }
+
+    function endGame() {
+        document.getElementById('game-ui').innerHTML = `
+            <h2>Time's Up!</h2>
+            <p>Final Score: ${gameScore}</p>
+            <button class="action-btn" onclick="location.reload()">Play Again</button>
+        `;
+    }
+
+    // --- Initialization ---
+    window.onload = function() {
+        initSorter();
+        initDef();
+        initReading1();
+        initReading2();
+        renderScenario();
+    }
+
+</script>
+
+</body>
+</html>
