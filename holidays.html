@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holidays & Festivals</title>
+    <style>
+        :root {
+            --primary: #dc2626; /* Holiday Red */
+            --primary-dark: #991b1b;
+            --secondary: #1e293b; /* Slate */
+            --bg: #fef2f2; /* Very light warm red/snow */
+            --card-bg: #ffffff;
+            --success: #15803d; /* Pine Green */
+            --error: #b91c1c;
+            --text-main: #1e293b;
+            --accent: #f59e0b; /* Gold */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-bottom: 5px solid var(--accent);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            opacity: 0.9;
+        }
+
+        /* --- Navigation --- */
+        .nav-scroller {
+            overflow-x: auto;
+            white-space: nowrap;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tabs {
+            display: inline-flex;
+            gap: 10px;
+            list-style: none;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid #fecaca;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary);
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* --- Sections --- */
+        .section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #fecaca;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid #fecaca;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            margin: 15px 0 10px 0;
+            color: var(--text-main);
+        }
+
+        /* --- Components: Inputs & Buttons --- */
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        .gap-input {
+            width: 120px !important;
+            display: inline-block;
+            margin: 0 5px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #94a3b8;
+            border-bottom: 2px solid #94a3b8;
+            background: #f8fafc;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        button.action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        button.secondary-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: none;
+        }
+        .feedback.success { background: #dcfce7; color: #14532d; display: block; }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        /* --- Activity: Vocab Sorter --- */
+        .sorter-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .sorter-area { grid-template-columns: 1fr; }
+        }
+
+        .drop-zone {
+            background: #fef2f2;
+            border: 2px dashed #f87171;
+            border-radius: 8px;
+            min-height: 200px;
+            padding: 10px;
+        }
+
+        .drop-zone h4 { text-align: center; margin-bottom: 10px; }
+        .drop-zone.halloween { border-color: #f97316; background: #fff7ed; } /* Orange */
+        .drop-zone.christmas { border-color: #15803d; background: #f0fdf4; } /* Green */
+
+        .vocab-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+
+        .vocab-item {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .vocab-item.selected {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* --- Activity: Scramble --- */
+        .scramble-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .scramble-word {
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            font-weight: bold;
+            color: var(--secondary);
+            background: #e2e8f0;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        /* --- Readings --- */
+        .reading-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #334155;
+            padding: 20px;
+            background: #fff;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .question-block {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .options label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        /* --- Game Section --- */
+        .game-screen {
+            text-align: center;
+            padding: 20px;
+        }
+        .timer-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .timer-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--primary);
+            transition: width 1s linear;
+        }
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .game-btn {
+            width: 45%;
+            padding: 20px;
+            margin: 10px 2%;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-green { background: var(--success); }
+        .btn-red { background: var(--error); }
+
+        /* Images */
+        .img-header {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Holidays & Festivals</h1>
+        <p>B1 Intermediate ESL Lesson</p>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav-scroller">
+        <ul class="nav-tabs" id="navTabs">
+            <li><button class="nav-btn active" onclick="showTab('warmup')">Warm-Up</button></li>
+            <li><button class="nav-btn" onclick="showTab('vocab1')">Sorter</button></li>
+            <li><button class="nav-btn" onclick="showTab('gapfill')">Gap Fill</button></li>
+            <li><button class="nav-btn" onclick="showTab('spelling')">Spelling</button></li>
+            <li><button class="nav-btn" onclick="showTab('reading1')">Reading</button></li>
+            <li><button class="nav-btn" onclick="showTab('fun')">Party Planner</button></li>
+            <li><button class="nav-btn" onclick="showTab('game')">Blitz Game</button></li>
+        </ul>
+    </div>
+
+    <!-- 1. Warm-up Section -->
+    <div id="warmup" class="section active">
+        <div class="card">
+            <h2>Warm-Up Discussion</h2>
+            <img src="https://images.unsplash.com/photo-1512389142860-9c449ded37fd?auto=format&fit=crop&q=80&w=1000" alt="Holidays" class="img-header">
+            <p style="margin-bottom: 15px;">Discuss these questions with your partner or type your thoughts:</p>
+            
+            <h3>1. What is the most popular holiday in your country? Why?</h3>
+            <textarea id="wu1" rows="2" placeholder="The most popular holiday is..."></textarea>
+            
+            <h3>2. Do you prefer giving gifts or receiving gifts?</h3>
+            <textarea id="wu2" rows="2" placeholder="I prefer... because..."></textarea>
+
+            <h3>3. What is a "New Year's Resolution"? Do you make them?</h3>
+            <textarea id="wu3" rows="2" placeholder="A resolution is..."></textarea>
+
+            <button class="action-btn" onclick="checkWarmup()">Submit Answers</button>
+            <div id="wu-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 2. Vocab Sorter -->
+    <div id="vocab1" class="section">
+        <div class="card">
+            <h2>Holiday Sorter</h2>
+            <p>Tap an object, then tap the holiday it belongs to. Is it for <strong>Halloween</strong> or <strong>Christmas</strong>?</p>
+            
+            <div class="vocab-pool" id="vocabPool">
+                <!-- JS will populate this -->
+            </div>
+
+            <div class="sorter-area">
+                <div class="drop-zone halloween" onclick="moveToBox('halloween')">
+                    <h4>🎃 Halloween</h4>
+                    <div id="box-halloween"></div>
+                </div>
+                <div class="drop-zone christmas" onclick="moveToBox('christmas')">
+                    <h4>🎄 Christmas</h4>
+                    <div id="box-christmas"></div>
+                </div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                 <button class="action-btn" onclick="checkSorter()">Check Answers</button>
+                 <button class="secondary-btn" onclick="resetSorter()">Reset</button>
+            </div>
+            <div id="sorter-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 3. Gap Fill Drill (NEW) -->
+    <div id="gapfill" class="section">
+        <div class="card">
+            <h2>Gap Fill: New Year's Eve</h2>
+            <p>Type the missing words into the boxes. Use the word bank below.</p>
+            
+            <div style="background:#f1f5f9; padding:10px; margin-bottom:15px; border-radius:8px; font-weight:bold; color:var(--secondary); text-align:center;">
+                Bank: fireworks, midnight, countdown, resolutions, tradition, celebrate
+            </div>
+
+            <div class="reading-text" style="line-height: 2.5;">
+                <p>New Year's Eve is the last day of the year. People often gather with friends to <input type="text" class="gap-input" data-ans="celebrate">.
+                A popular <input type="text" class="gap-input" data-ans="tradition"> is to watch the clock.
+                Just before <input type="text" class="gap-input" data-ans="midnight">, everyone begins the <input type="text" class="gap-input" data-ans="countdown"> : "Ten, nine, eight...".
+                When the clock strikes twelve, colorful <input type="text" class="gap-input" data-ans="fireworks"> light up the sky.
+                Many people also make <input type="text" class="gap-input" data-ans="resolutions"> to improve their lives in the coming year.</p>
+            </div>
+
+            <button class="action-btn" onclick="checkGapFill()">Check Spelling</button>
+            <div id="gap-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 4. Spelling Scramble (NEW) -->
+    <div id="spelling" class="section">
+        <div class="card">
+            <h2>Word Scramble</h2>
+            <p>Unscramble the holiday words.</p>
+            <div id="scramble-container">
+                <!-- JS Populated -->
+            </div>
+            <button class="action-btn" onclick="checkScramble()">Check Words</button>
+            <div id="scramble-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 5. Reading -->
+    <div id="reading1" class="section">
+        <div class="card">
+            <h2>Reading: Strange Traditions</h2>
+            <img src="https://images.unsplash.com/photo-1545645564-9b57b9894957?auto=format&fit=crop&q=80&w=1000" alt="Tradition" class="img-header">
+            
+            <div class="reading-text">
+                <p>While many people know about Santa Claus, other countries have stranger traditions. In <strong>Austria</strong>, bad children worry about 'Krampus'. He is a scary, horned monster who punishes naughty kids during Christmas time.</p>
+                <br>
+                <p>In <strong>Spain</strong>, there is a tradition called 'La Tomatina'. It is a huge festival where people throw thousands of tomatoes at each other just for fun! It happens in August, so it is very messy and hot.</p>
+                <br>
+                <p>In <strong>Denmark</strong>, people save their old plates and dishes all year round. On New Year's Eve, they throw them at the front doors of their friends' houses. A big pile of broken glass at your door means you have many friends!</p>
+            </div>
+
+            <h3>Comprehension Check</h3>
+            <div id="quiz-r1"></div>
+            <button class="action-btn" onclick="checkReading1()">Check Answers</button>
+            <div id="r1-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <!-- 6. Fun Task -->
+    <div id="fun" class="section">
+        <div class="card">
+            <h2>Party Planner Disaster</h2>
+            <p>You are planning a Holiday Party, but everything is going wrong! Fix the problems.</p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <div id="party-scenario">
+                <!-- JS Populated -->
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <button class="secondary-btn" onclick="nextPartyScenario()">Next Problem</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. Game -->
+    <div id="game" class="section">
+        <div class="card game-screen">
+            <h2>Holiday Blitz!</h2>
+            <p>A word will appear. Is it related to a <strong>HOLIDAY</strong> or is it just <strong>EVERYDAY</strong> life? Be fast!</p>
+            <br>
+            <button class="action-btn" id="start-game-btn" onclick="startGame()">Start Blitz</button>
+            
+            <div id="game-ui" style="display:none;">
+                <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+                <div class="score-display">Score: <span id="score">0</span></div>
+                
+                <h2 id="game-prompt" style="font-size: 2rem; margin: 30px 0;">Prompt</h2>
+                
+                <div>
+                    <button class="game-btn btn-green" onclick="answerGame('holiday')">HOLIDAY 🎉</button>
+                    <button class="game-btn btn-red" onclick="answerGame('everyday')">EVERYDAY 🏠</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Data ---
+    const vocabList = [
+        { word: "Pumpkin", type: "halloween" },
+        { word: "Stocking", type: "christmas" },
+        { word: "Ghost", type: "halloween" },
+        { word: "Reindeer", type: "christmas" },
+        { word: "Witch", type: "halloween" },
+        { word: "Tinsel", type: "christmas" },
+        { word: "Skeleton", type: "halloween" },
+        { word: "Ornament", type: "christmas" },
+        { word: "Spider", type: "halloween" },
+        { word: "Mistletoe", type: "christmas" },
+        { word: "Vampire", type: "halloween" },
+        { word: "Sleigh", type: "christmas" }
+    ];
+
+    const scrambleWords = [
+        { word: "CANDLE", scrambled: "DNALEC" },
+        { word: "PARADE", scrambled: "RADAPE" },
+        { word: "COSTUME", scrambled: "MESTUCO" },
+        { word: "FEAST", scrambled: "STAFE" },
+        { word: "PRESENT", scrambled: "STERNEP" }
+    ];
+
+    const reading1Questions = [
+        { q: "Who is Krampus?", options: ["Santa's helper", "A scary monster", "A type of food"], a: 1 },
+        { q: "What do people throw in Spain?", options: ["Apples", "Plates", "Tomatoes"], a: 2 },
+        { q: "In Denmark, what does broken glass mean?", options: ["Bad luck", "Many friends", "Anger"], a: 1 },
+        { q: "When does La Tomatina happen?", options: ["December", "August", "October"], a: 1 }
+    ];
+
+    const partyScenarios = [
+        { text: "The turkey is burned!", opts: ["Order Pizza", "Serve it anyway", "Cry"] },
+        { text: "Uncle Bob is talking about politics!", opts: ["Change subject", "Argue", "Turn up music"] },
+        { text: "We ran out of ice!", opts: ["Drink warm soda", "Use snow from outside", "Run to shop"] },
+        { text: "The dog ate the Christmas tree!", opts: ["Scold dog", "Decorate the dog", "Buy new tree"] }
+    ];
+
+    const gameData = [
+        { word: "Santa", type: "holiday" },
+        { word: "Laptop", type: "everyday" },
+        { word: "Elf", type: "holiday" },
+        { word: "Stapler", type: "everyday" },
+        { word: "Turkey", type: "holiday" },
+        { word: "Bus", type: "everyday" },
+        { word: "Confetti", type: "holiday" },
+        { word: "Printer", type: "everyday" },
+        { word: "Mask", type: "holiday" },
+        { word: "Toothpaste", type: "everyday" }
+    ];
+
+    // --- State ---
+    let selectedWord = null;
+    let selectedElement = null;
+    let gameScore = 0;
+    let gameTimer = null;
+    let partyIndex = 0;
+    let gameItems = [];
+    let currentItem = null;
+
+    // --- Navigation ---
+    function showTab(tabId) {
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        
+        // Highlight button
+        const btns = document.querySelectorAll('.nav-btn');
+        btns.forEach(btn => {
+            if(btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active');
+        });
+    }
+
+    // --- Warm Up ---
+    function checkWarmup() {
+        const w1 = document.getElementById('wu1').value;
+        const fb = document.getElementById('wu-feedback');
+        if(w1.length > 3) {
+            fb.textContent = "Nice work. Discuss these with your teacher!";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = "Please write a bit more.";
+            fb.className = "feedback error";
+        }
+    }
+
+    // --- Vocab Sorter ---
+    function initSorter() {
+        const pool = document.getElementById('vocabPool');
+        pool.innerHTML = '';
+        document.getElementById('box-halloween').innerHTML = '';
+        document.getElementById('box-christmas').innerHTML = '';
+        
+        vocabList.sort(() => Math.random() - 0.5);
+
+        vocabList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vocab-item';
+            div.textContent = item.word;
+            div.dataset.type = item.type;
+            div.onclick = function() { selectWord(this); };
+            pool.appendChild(div);
+        });
+    }
+
+    function selectWord(el) {
+        if(selectedElement) selectedElement.classList.remove('selected');
+        selectedElement = el;
+        selectedElement.classList.add('selected');
+    }
+
+    function moveToBox(type) {
+        if(!selectedElement) return;
+        const targetBox = document.getElementById(`box-${type}`);
+        const clone = selectedElement.cloneNode(true);
+        clone.classList.remove('selected');
+        clone.style.margin = '5px';
+        clone.style.display = 'inline-block';
+        clone.onclick = null;
+        targetBox.appendChild(clone);
+        selectedElement.remove();
+        selectedElement = null;
+    }
+
+    function checkSorter() {
+        const halloween = document.getElementById('box-halloween').children;
+        const christmas = document.getElementById('box-christmas').children;
+        let errors = 0;
+
+        for(let el of halloween) { if(el.dataset.type !== 'halloween') errors++; }
+        for(let el of christmas) { if(el.dataset.type !== 'christmas') errors++; }
+
+        const fb = document.getElementById('sorter-feedback');
+        if(document.getElementById('vocabPool').children.length > 0) {
+            fb.textContent = "Finish sorting all words first!";
+            fb.className = "feedback error";
+        } else if(errors === 0) {
+            fb.textContent = "Perfect! You know your holidays.";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = `You have ${errors} mistakes. Check again.`;
+            fb.className = "feedback error";
+        }
+    }
+
+    function resetSorter() {
+        initSorter();
+        document.getElementById('sorter-feedback').style.display = 'none';
+    }
+
+    // --- Gap Fill ---
+    function checkGapFill() {
+        const inputs = document.querySelectorAll('.gap-input');
+        let correct = 0;
+        
+        inputs.forEach(input => {
+            if(input.value.toLowerCase().trim() === input.dataset.ans) {
+                input.style.borderColor = "var(--success)";
+                input.style.backgroundColor = "#dcfce7";
+                correct++;
+            } else {
+                input.style.borderColor = "var(--error)";
+                input.style.backgroundColor = "#fee2e2";
+            }
+        });
+
+        const fb = document.getElementById('gap-feedback');
+        fb.textContent = `You got ${correct}/${inputs.length} correct. Watch your spelling!`;
+        fb.className = correct === inputs.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Scramble ---
+    function initScramble() {
+        const container = document.getElementById('scramble-container');
+        let html = '';
+        scrambleWords.forEach((item, index) => {
+            html += `
+            <div class="scramble-row">
+                <span class="scramble-word">${item.scrambled}</span>
+                <input type="text" id="scr-${index}" placeholder="Type answer..." style="width: 150px; margin:0;">
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkScramble() {
+        let correct = 0;
+        scrambleWords.forEach((item, index) => {
+            const input = document.getElementById(`scr-${index}`);
+            if(input.value.toUpperCase().trim() === item.word) {
+                input.style.borderColor = "var(--success)";
+                correct++;
+            } else {
+                input.style.borderColor = "var(--error)";
+            }
+        });
+        const fb = document.getElementById('scramble-feedback');
+        fb.textContent = `You got ${correct}/${scrambleWords.length} correct.`;
+        fb.className = correct === scrambleWords.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Reading Quiz ---
+    function initReading1() {
+        const container = document.getElementById('quiz-r1');
+        let html = '';
+        reading1Questions.forEach((q, idx) => {
+            html += `<div class="question-block"><p><strong>${idx+1}. ${q.q}</strong></p><div class="options">`;
+            q.options.forEach((opt, oIdx) => {
+                html += `<label><input type="radio" name="r1q${idx}" value="${oIdx}"> ${opt}</label>`;
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function checkReading1() {
+        let score = 0;
+        reading1Questions.forEach((q, idx) => {
+            const selected = document.querySelector(`input[name="r1q${idx}"]:checked`);
+            if(selected && parseInt(selected.value) === q.a) score++;
+        });
+        const fb = document.getElementById('r1-feedback');
+        fb.textContent = `Score: ${score}/${reading1Questions.length}`;
+        fb.className = score === reading1Questions.length ? "feedback success" : "feedback error";
+    }
+
+    // --- Party Planner ---
+    function renderParty() {
+        const container = document.getElementById('party-scenario');
+        if(partyIndex >= partyScenarios.length) partyIndex = 0;
+        
+        const current = partyScenarios[partyIndex];
+        
+        container.innerHTML = `
+            <h3 style="text-align:center;">Problem #${partyIndex + 1}</h3>
+            <p style="font-size: 1.2rem; text-align:center; margin: 20px 0;">"${current.text}"</p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="action-btn" onclick="alert('Problem solved!')">${current.opts[0]}</button>
+                <button class="action-btn" style="background:var(--secondary)" onclick="alert('Risky choice!')">${current.opts[1]}</button>
+                <button class="action-btn" style="background:var(--accent)" onclick="alert('Creative solution!')">${current.opts[2]}</button>
+            </div>
+        `;
+    }
+
+    function nextPartyScenario() {
+        partyIndex++;
+        renderParty();
+    }
+
+    // --- Game Logic ---
+    function startGame() {
+        gameItems = [...gameData];
+        document.getElementById('start-game-btn').style.display = 'none';
+        document.getElementById('game-ui').style.display = 'block';
+        gameScore = 0;
+        document.getElementById('score').innerText = gameScore;
+        nextGameItem();
+    }
+
+    function nextGameItem() {
+        if(gameItems.length === 0) {
+            endGame();
+            return;
+        }
+        
+        const idx = Math.floor(Math.random() * gameItems.length);
+        currentItem = gameItems[idx];
+        document.getElementById('game-prompt').innerText = currentItem.word;
+        
+        // Timer
+        const bar = document.getElementById('timer-fill');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        setTimeout(() => {
+            bar.style.transition = 'width 2.5s linear'; // Slightly faster for Blitz
+            bar.style.width = '0%';
+        }, 10);
+
+        if(gameTimer) clearTimeout(gameTimer);
+        gameTimer = setTimeout(() => {
+            answerGame(null);
+        }, 2500);
+    }
+
+    function answerGame(choice) {
+        clearTimeout(gameTimer);
+        let correct = false;
+        if(choice === currentItem.type) correct = true;
+        
+        if(correct) {
+            gameScore += 10;
+            document.getElementById('score').innerText = gameScore;
+        }
+
+        gameItems = gameItems.filter(i => i !== currentItem);
+        nextGameItem();
+    }
+
+    function endGame() {
+        document.getElementById('game-ui').innerHTML = `
+            <h2>Time's Up!</h2>
+            <p>Final Score: ${gameScore}</p>
+            <button class="action-btn" onclick="location.reload()">Play Again</button>
+        `;
+    }
+
+    // --- Initialization ---
+    window.onload = function() {
+        initSorter();
+        initScramble();
+        initReading1();
+        renderParty();
+    }
+
+</script>
+
+</body>
+</html>

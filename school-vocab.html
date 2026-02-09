@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Vocabulary Masterclass</title>
+    <style>
+        :root {
+            --primary: #4f46e5; /* Indigo */
+            --primary-dark: #4338ca;
+            --secondary: #059669; /* Emerald */
+            --accent: #d97706; /* Amber */
+            --bg: #f8fafc; /* Slate 50 */
+            --text: #1e293b; /* Slate 800 */
+            --card-bg: #ffffff;
+            --danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; }
+        h2 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .subtitle { opacity: 0.9; font-weight: 300; margin-top: 0.5rem; }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Vocab List --- */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        .vocab-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .vocab-table th { text-align: left; background: #f1f5f9; padding: 1rem; color: var(--primary); }
+        .vocab-table td { border-bottom: 1px solid #e2e8f0; padding: 1rem; vertical-align: top; }
+        .vocab-table tr:hover { background: #f8fafc; }
+        .cz-word { font-weight: bold; color: var(--secondary); }
+        .ex-sentence { font-style: italic; color: #64748b; font-size: 0.9rem; margin-top: 0.25rem; display: block; }
+
+        /* --- Utilities --- */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-check { background: var(--secondary); width: 100%; }
+        .feedback { margin-top: 1rem; padding: 1rem; border-radius: 0.5rem; display: none; font-weight: bold; text-align: center; }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        /* --- Match Game --- */
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .match-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .match-card {
+            background: white; border: 2px solid #e2e8f0; padding: 1rem;
+            text-align: center; cursor: pointer; border-radius: 0.5rem; transition: all 0.2s; user-select: none;
+        }
+        .match-card.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .match-card.matched { background: #dcfce7; color: var(--secondary); border-color: var(--secondary); opacity: 0.6; pointer-events: none; }
+
+        /* --- Gap Fill --- */
+        .fill-item { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 4px solid var(--primary); }
+        select { padding: 0.5rem; border: 2px solid #cbd5e1; border-radius: 0.3rem; font-size: 1rem; background: white; max-width: 100%; }
+        select.correct { border-color: var(--secondary); background: #ecfdf5; color: var(--secondary); }
+        select.incorrect { border-color: var(--danger); background: #fef2f2; }
+
+        /* --- Word Scramble --- */
+        .scramble-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; background: white; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; }
+        .scrambled-text { font-family: monospace; letter-spacing: 2px; font-size: 1.2rem; font-weight: bold; color: var(--accent); }
+        .scramble-input { padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 1rem; width: 50%; }
+
+        /* --- Spin Wheel --- */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 10px solid #e2e8f0;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: conic-gradient(
+                #ef4444 0deg 60deg,
+                #f59e0b 60deg 120deg,
+                #10b981 120deg 180deg,
+                #3b82f6 180deg 240deg,
+                #8b5cf6 240deg 300deg,
+                #ec4899 300deg 360deg
+            );
+        }
+        .wheel-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 2;
+        }
+        .wheel-pointer {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
+            border-top: 30px solid var(--text); z-index: 3;
+        }
+        .wheel-result {
+            text-align: center; margin-top: 1.5rem; padding: 1rem; background: #fffbeb;
+            border: 2px solid #fcd34d; border-radius: 0.5rem; min-height: 100px;
+        }
+        .big-word { font-size: 1.5rem; font-weight: bold; color: var(--primary); display: block; margin-bottom: 0.5rem; }
+
+        @media (max-width: 600px) {
+            .match-grid { grid-template-columns: 1fr; }
+            .vocab-table th:nth-child(3), .vocab-table td:nth-child(3) { display: none; }
+            .scramble-row { flex-direction: column; gap: 0.5rem; text-align: center; }
+            .scramble-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>School Vocabulary</h1>
+        <div class="subtitle">Places, Rules, Stationery & Actions</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. Vocabulary List -->
+    <section>
+        <h2>📚 Vocabulary List</h2>
+        <div class="category-tabs">
+            <button class="tab-btn active" id="tab-places" onclick="filterVocab('places')">Places</button>
+            <button class="tab-btn" id="tab-rules" onclick="filterVocab('rules')">Rules</button>
+            <button class="tab-btn" id="tab-stationery" onclick="filterVocab('stationery')">Stationery</button>
+            <button class="tab-btn" id="tab-actions" onclick="filterVocab('actions')">Actions</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="vocab-table">
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>Czech</th>
+                        <th>Definition / Example</th>
+                    </tr>
+                </thead>
+                <tbody id="vocab-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 2. Match Up Game -->
+    <section>
+        <h2>🧩 Drill 1: Meaning Match</h2>
+        <p>Match the English word to the Czech translation.</p>
+        <div class="match-grid">
+            <div class="match-col" id="col-eng"></div>
+            <div class="match-col" id="col-cz"></div>
+        </div>
+        <div id="match-feedback" class="feedback"></div>
+        <button class="btn btn-reset" style="background:transparent; color:#666; font-size:0.9rem; text-decoration:underline; margin-top:0;" onclick="initMatchGame()">Reset Game</button>
+    </section>
+
+    <!-- 3. Gap Fill -->
+    <section>
+        <h2>✍️ Drill 2: Complete the Sentence</h2>
+        <p>Select the correct word to complete the sentences (taken from the list).</p>
+        <div id="gap-container"></div>
+        <button class="btn btn-check" onclick="checkGapFill()">Check Answers</button>
+        <div id="gap-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 4. Word Scramble -->
+    <section>
+        <h2>🔡 Drill 3: Stationery Scramble</h2>
+        <p>Unscramble the letters to find the stationery items.</p>
+        
+        <div class="scramble-row">
+            <span class="scrambled-text">RELUR</span>
+            <input type="text" class="scramble-input" data-ans="ruler" placeholder="Type word...">
+        </div> <!-- Wait, Ruler wasn't in list, changing to Compass -->
+        
+        <div class="scramble-row">
+            <span class="scrambled-text">REASRE</span>
+            <input type="text" class="scramble-input" data-ans="eraser" placeholder="Type word...">
+        </div>
+        <div class="scramble-row">
+            <span class="scrambled-text">TOCALCULAR</span>
+            <input type="text" class="scramble-input" data-ans="calculator" placeholder="Type word...">
+        </div>
+        <div class="scramble-row">
+            <span class="scrambled-text">KOTBOTE X</span>
+            <input type="text" class="scramble-input" data-ans="textbook" placeholder="Type word...">
+        </div>
+        <div class="scramble-row">
+            <span class="scrambled-text">DINBER</span>
+            <input type="text" class="scramble-input" data-ans="binder" placeholder="Type word...">
+        </div>
+        <div class="scramble-row">
+            <span class="scrambled-text">MASSCOP</span>
+            <input type="text" class="scramble-input" data-ans="compass" placeholder="Type word...">
+        </div>
+
+        <button class="btn btn-check" onclick="checkScramble()">Check Spelling</button>
+        <div id="scramble-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 5. Logic Puzzle -->
+    <section>
+        <h2>🕵️ Drill 4: Where am I?</h2>
+        <p>Read the clue and choose the correct room.</p>
+        
+        <div class="fill-item">
+            1. It's very quiet. There are thousands of books. I am whispering.<br>
+            <strong>I am in the...</strong> 
+            <select class="logic-select" data-ans="library">
+                <option value="">Choose...</option>
+                <option value="canteen">Canteen</option>
+                <option value="library">Library</option>
+                <option value="gym">Gym</option>
+            </select>
+        </div>
+
+        <div class="fill-item">
+            2. I am eating lunch with my friends. It smells like food.<br>
+            <strong>I am in the...</strong>
+            <select class="logic-select" data-ans="canteen">
+                <option value="">Choose...</option>
+                <option value="staff room">Staff room</option>
+                <option value="canteen">Canteen</option>
+                <option value="lab">Lab</option>
+            </select>
+        </div>
+
+        <div class="fill-item">
+            3. Teachers are drinking coffee here. Students are NOT allowed!<br>
+            <strong>I am in the...</strong>
+            <select class="logic-select" data-ans="staff room">
+                <option value="">Choose...</option>
+                <option value="staff room">Staff room</option>
+                <option value="main office">Main office</option>
+                <option value="corridor">Corridor</option>
+            </select>
+        </div>
+
+        <div class="fill-item">
+            4. I am running outside and playing football.<br>
+            <strong>I am in the...</strong>
+            <select class="logic-select" data-ans="playground">
+                <option value="">Choose...</option>
+                <option value="assembly hall">Assembly hall</option>
+                <option value="playground">Playground</option>
+                <option value="changing room">Changing room</option>
+            </select>
+        </div>
+
+        <button class="btn btn-check" onclick="checkLogic()">Check Locations</button>
+        <div id="logic-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 6. Spin Wheel -->
+    <section>
+        <h2>🎰 Spin the Wheel</h2>
+        <p>Spin the wheel. Use the word you get in a perfect sentence!</p>
+        
+        <div style="position: relative; margin: 2rem 0;">
+            <div class="wheel-pointer"></div>
+            <div class="wheel-container" id="wheel"></div>
+            <div class="wheel-center" onclick="spinWheel()">SPIN</div>
+        </div>
+
+        <div class="wheel-result" id="wheel-output">
+            Press SPIN to start!
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // --- DATA ---
+    const vocabData = [
+        // Places
+        { cat: 'places', word: 'Assembly hall', cz: 'Aula', def: 'Large room for meetings.', ex: 'We meet in the assembly hall for speeches.' },
+        { cat: 'places', word: 'Staff room', cz: 'Sborovna', def: 'Room for teachers.', ex: 'Don\'t go in the staff room without knocking.' },
+        { cat: 'places', word: 'Canteen', cz: 'Jídelna', def: 'Place to eat lunch.', ex: 'The food in the canteen is decent today.' },
+        { cat: 'places', word: 'Changing room', cz: 'Šatna', def: 'Room to change clothes.', ex: 'I left my trainers in the changing room.' },
+        { cat: 'places', word: 'Corridor', cz: 'Chodba', def: 'Long passage.', ex: 'No running in the corridors!' },
+        { cat: 'places', word: 'Dormitory', cz: 'Internát', def: 'Building where students sleep.', ex: 'Living in a dormitory is fun.' },
+        { cat: 'places', word: 'IT lab', cz: 'PC učebna', def: 'Room with computers.', ex: 'We are heading to the IT lab.' },
+        { cat: 'places', word: 'Library', cz: 'Knihovna', def: 'Room with books.', ex: 'It is dead quiet in the library.' },
+        { cat: 'places', word: 'Main office', cz: 'Kancelář', def: 'Admin office.', ex: 'Go to the main office if you lost your ID.' },
+        { cat: 'places', word: 'Playground', cz: 'Hřiště', def: 'Outdoor area.', ex: 'Everyone hangs out on the playground.' },
+
+        // Rules
+        { cat: 'rules', word: 'To attend', cz: 'Navštěvovat', def: 'To be present.', ex: 'You need to attend 80% of classes.' },
+        { cat: 'rules', word: 'Compulsory', cz: 'Povinný', def: 'Must do it.', ex: 'Maths is a compulsory subject.' },
+        { cat: 'rules', word: 'Detention', cz: 'Škola po škole', def: 'Punishment staying late.', ex: 'I got a detention for being late.' },
+        { cat: 'rules', word: 'Dress code', cz: 'Pravidla oblékání', def: 'Clothing rules.', ex: 'Our school has a strict dress code.' },
+        { cat: 'rules', word: 'Forbidden', cz: 'Zakázaný', def: 'Not allowed.', ex: 'Phones are strictly forbidden.' },
+        { cat: 'rules', word: 'To hand in', cz: 'Odevzdat', def: 'Give work to teacher.', ex: 'Hand in your essay by Friday.' },
+        { cat: 'rules', word: 'On time', cz: 'Včas', def: 'Not late.', ex: 'You must be on time for registration.' },
+        { cat: 'rules', word: 'Permission', cz: 'Povolení', def: 'Allowed to do something.', ex: 'You need permission to leave.' },
+        { cat: 'rules', word: 'Punctuality', cz: 'Dochvilnost', def: 'Being on time.', ex: 'Teachers care about punctuality.' },
+        { cat: 'rules', word: 'Suspension', cz: 'Vyloučení', def: 'Sent home as punishment.', ex: 'He is on suspension for fighting.' },
+        { cat: 'rules', word: 'Uniform', cz: 'Uniforma', def: 'Set clothes for school.', ex: 'I hate wearing a uniform.' },
+
+        // Stationery
+        { cat: 'stationery', word: 'Binder', cz: 'Šanon', def: 'Folder for notes.', ex: 'Put notes in your binder.' },
+        { cat: 'stationery', word: 'Calculator', cz: 'Kalkulačka', def: 'Maths machine.', ex: 'Can I borrow a calculator?' },
+        { cat: 'stationery', word: 'Compass', cz: 'Kružítko', def: 'Drawing circles.', ex: 'You need a compass for geometry.' },
+        { cat: 'stationery', word: 'Dictionary', cz: 'Slovník', def: 'Book of words.', ex: 'Look it up in the dictionary.' },
+        { cat: 'stationery', word: 'Eraser', cz: 'Guma', def: 'Rubbers out mistakes.', ex: 'Can I use your eraser?' },
+        { cat: 'stationery', word: 'Highlighter', cz: 'Zvýrazňovač', def: 'Bright pen.', ex: 'Use a highlighter for dates.' },
+        { cat: 'stationery', word: 'Locker', cz: 'Skříňka', def: 'Cupboard for bags.', ex: 'My books are in my locker.' },
+        { cat: 'stationery', word: 'Notebook', cz: 'Sešit', def: 'Book to write in.', ex: 'Grab a fresh notebook.' },
+        { cat: 'stationery', word: 'Noticeboard', cz: 'Nástěnka', def: 'Pin board.', ex: 'Check the noticeboard for news.' },
+        { cat: 'stationery', word: 'Protractor', cz: 'Úhloměr', def: 'Measuring angles.', ex: 'We used a protractor in maths.' },
+        { cat: 'stationery', word: 'Textbook', cz: 'Učebnice', def: 'Book for learning.', ex: 'Open your biology textbook.' },
+
+        // Actions
+        { cat: 'actions', word: 'To achieve', cz: 'Dosáhnout', def: 'To succeed.', ex: 'Work hard to achieve top grades.' },
+        { cat: 'actions', word: 'To cheat', cz: 'Podvádět', def: 'Act dishonestly.', ex: 'Don\'t try to cheat on the test.' },
+        { cat: 'actions', word: 'To concentrate', cz: 'Soustředit se', def: 'Focus.', ex: 'It is hard to concentrate with noise.' },
+        { cat: 'actions', word: 'To enroll', cz: 'Zapsat se', def: 'Join a class.', ex: 'I want to enroll in Spanish.' },
+        { cat: 'actions', word: 'To fail', cz: 'Propadnout', def: 'Not pass.', ex: 'I am worried I will fail chemistry.' },
+        { cat: 'actions', word: 'To improve', cz: 'Zlepšit se', def: 'Get better.', ex: 'Your English has improved.' },
+        { cat: 'actions', word: 'To lecture', cz: 'Přednášet', def: 'Give a talk.', ex: 'He will lecture on Rome.' },
+        { cat: 'actions', word: 'To memorize', cz: 'Učit se nazpaměť', def: 'Learn by heart.', ex: 'I must memorize this poem.' },
+        { cat: 'actions', word: 'To pass', cz: 'Složit', def: 'Succeed in test.', ex: 'I was happy I passed.' },
+        { cat: 'actions', word: 'To procrastinate', cz: 'Prokrastinovat', def: 'Delay work.', ex: 'Stop procrastinating and work!' },
+        { cat: 'actions', word: 'To resit', cz: 'Opakovat', def: 'Take exam again.', ex: 'I have to resit the test.' },
+        { cat: 'actions', word: 'To revise', cz: 'Opakovat si', def: 'Study again.', ex: 'Revise for the final exam.' },
+        { cat: 'actions', word: 'To skip class', cz: 'Jít za školu', def: 'Not go to lesson.', ex: 'Don\'t skip class.' },
+        { cat: 'actions', word: 'To struggle', cz: 'Bojovat s', def: 'Find hard.', ex: 'I struggle with physics.' },
+        { cat: 'actions', word: 'To tutor', cz: 'Doučovat', def: 'Teach one person.', ex: 'He will tutor me in algebra.' }
+    ];
+
+    // --- 1. POPULATE TABLE ---
+    function filterVocab(category) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + category).classList.add('active');
+
+        const tbody = document.getElementById('vocab-body');
+        tbody.innerHTML = '';
+        
+        vocabData.filter(v => v.cat === category).forEach(v => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><strong>${v.word}</strong></td><td class="cz-word">${v.cz}</td><td>${v.def}<br><span class="ex-sentence">"${v.ex}"</span></td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- 2. MATCH GAME ---
+    let selectedEng = null;
+    
+    function initMatchGame() {
+        // Pick 8 random words from ALL categories
+        const gameItems = [...vocabData].sort(() => 0.5 - Math.random()).slice(0, 8);
+        const colEng = document.getElementById('col-eng');
+        const colCz = document.getElementById('col-cz');
+        document.getElementById('match-feedback').className = 'feedback';
+        
+        colEng.innerHTML = ''; colCz.innerHTML = '';
+
+        [...gameItems].sort(() => 0.5 - Math.random()).forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card'; el.textContent = item.word;
+            el.onclick = () => selectEng(el, item.word);
+            colEng.appendChild(el);
+        });
+
+        [...gameItems].sort(() => 0.5 - Math.random()).forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card'; el.textContent = item.cz;
+            el.dataset.match = item.word;
+            el.onclick = () => selectCz(el);
+            colCz.appendChild(el);
+        });
+    }
+
+    function selectEng(el, word) {
+        if(el.classList.contains('matched')) return;
+        document.querySelectorAll('#col-eng .match-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedEng = { el: el, word: word };
+    }
+
+    function selectCz(el) {
+        if(!selectedEng || el.classList.contains('matched')) return;
+        if(el.dataset.match === selectedEng.word) {
+            el.classList.add('matched');
+            selectedEng.el.classList.add('matched');
+            selectedEng.el.classList.remove('selected');
+            selectedEng = null;
+            if(document.querySelectorAll('#col-eng .match-card:not(.matched)').length === 0) {
+                document.getElementById('match-feedback').textContent = "Excellent Work!";
+                document.getElementById('match-feedback').className = "feedback success";
+            }
+        } else {
+            el.style.background = '#fee2e2';
+            setTimeout(() => el.style.background = 'white', 500);
+        }
+    }
+
+    // --- 3. GAP FILL ---
+    function initGapFill() {
+        const container = document.getElementById('gap-container');
+        // Pick 5 sentences
+        const items = [...vocabData].sort(() => 0.5 - Math.random()).slice(0, 5);
+        
+        items.forEach((item, idx) => {
+            // Create sentence with blank
+            // Simple regex replace for the word in the sentence (case insensitive)
+            const regex = new RegExp(item.word, 'gi');
+            const blankedEx = item.ex.replace(regex, '______');
+            
+            // Generate distractors
+            const others = vocabData.filter(v => v.word !== item.word).sort(()=>0.5-Math.random()).slice(0,2).map(v=>v.word);
+            const options = [item.word, ...others].sort(()=>0.5-Math.random());
+            
+            const div = document.createElement('div');
+            div.className = 'fill-item';
+            
+            let optsHtml = `<select class="gap-select" data-ans="${item.word}"><option value="">---</option>`;
+            options.forEach(o => optsHtml += `<option value="${o}">${o}</option>`);
+            optsHtml += `</select>`;
+
+            div.innerHTML = `<strong>${idx+1}.</strong> ${blankedEx} <br> ${optsHtml}`;
+            container.appendChild(div);
+        });
+    }
+
+    function checkGapFill() {
+        let score = 0;
+        document.querySelectorAll('.gap-select').forEach(sel => {
+            // Loose comparison for "To " verbs sometimes missing in sentence structure, 
+            // but here we used exact word replacement so exact match works.
+            if(sel.value === sel.dataset.ans) {
+                sel.className = 'gap-select correct'; score++;
+            } else {
+                sel.className = 'gap-select incorrect';
+            }
+        });
+        const fb = document.getElementById('gap-feedback');
+        fb.textContent = `You got ${score}/5`;
+        fb.className = score===5 ? 'feedback success' : 'feedback error';
+    }
+
+    // --- 4. SCRAMBLE ---
+    function checkScramble() {
+        let score = 0;
+        document.querySelectorAll('.scramble-input').forEach(inp => {
+            if(inp.value.toLowerCase().trim() === inp.dataset.ans) {
+                inp.style.borderColor = "var(--secondary)";
+                inp.style.background = "#ecfdf5";
+                score++;
+            } else {
+                inp.style.borderColor = "var(--danger)";
+                inp.style.background = "#fef2f2";
+            }
+        });
+        const fb = document.getElementById('scramble-feedback');
+        fb.textContent = score===6 ? "Perfect spelling!" : "Check your spelling.";
+        fb.className = score===6 ? 'feedback success' : 'feedback error';
+    }
+
+    // --- 5. LOGIC PUZZLE ---
+    function checkLogic() {
+        let score = 0;
+        document.querySelectorAll('.logic-select').forEach(sel => {
+            if(sel.value === sel.dataset.ans) {
+                sel.className = 'logic-select correct'; score++;
+            } else {
+                sel.className = 'logic-select incorrect';
+            }
+        });
+        const fb = document.getElementById('logic-feedback');
+        fb.textContent = score===4 ? "Correct locations!" : "Try again.";
+        fb.className = score===4 ? 'feedback success' : 'feedback error';
+    }
+
+    // --- 6. SPIN WHEEL ---
+    function spinWheel() {
+        const wheel = document.getElementById('wheel');
+        const output = document.getElementById('wheel-output');
+        
+        // Random degree: at least 3 spins (1080) + random
+        const deg = 1080 + Math.floor(Math.random() * 360);
+        wheel.style.transform = `rotate(${deg}deg)`;
+        
+        // Pick random word to display
+        const randomItem = vocabData[Math.floor(Math.random() * vocabData.length)];
+        
+        output.innerHTML = "Spinning...";
+        
+        setTimeout(() => {
+            output.innerHTML = `
+                <span class="big-word">${randomItem.word}</span>
+                Make a sentence about: <strong>${randomItem.def}</strong>
+            `;
+        }, 4000); // 4s matches CSS transition
+    }
+
+    // --- INIT ---
+    window.onload = function() {
+        filterVocab('places');
+        initMatchGame();
+        initGapFill();
+    };
+
+</script>
+
+</body>
+</html>

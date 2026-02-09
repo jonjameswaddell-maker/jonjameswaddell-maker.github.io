@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotions Vocabulary Masterclass</title>
+    <style>
+        :root {
+            --primary: #4f46e5; /* Indigo */
+            --primary-dark: #4338ca;
+            --secondary: #10B981; /* Emerald */
+            --accent: #F59E0B; /* Amber */
+            --bg: #F3F4F6; /* Slate 50 */
+            --text: #1F2937; /* Slate 800 */
+            --card-bg: #ffffff;
+            --danger: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 2.2rem; }
+        h2 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .subtitle { opacity: 0.9; font-weight: 300; margin-top: 0.5rem; }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- Vocab List --- */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        .vocab-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .vocab-table th { text-align: left; background: #f1f5f9; padding: 1rem; color: var(--primary); }
+        .vocab-table td { border-bottom: 1px solid #e2e8f0; padding: 1rem; vertical-align: top; }
+        .vocab-table tr:hover { background: #f8fafc; }
+        .cz-word { font-weight: bold; color: var(--secondary); }
+        .ex-sentence { font-style: italic; color: #64748b; font-size: 0.9rem; margin-top: 0.25rem; display: block; }
+
+        /* --- Utilities --- */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-check { background: var(--secondary); width: 100%; }
+        .feedback { margin-top: 1rem; padding: 1rem; border-radius: 0.5rem; display: none; font-weight: bold; text-align: center; }
+        .feedback.success { background: #d1fae5; color: #065f46; display: block; }
+        .feedback.error { background: #fee2e2; color: #991b1b; display: block; }
+
+        select, .type-input {
+            padding: 0.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.3rem;
+            font-size: 1rem;
+            background: white;
+            width: 100%;
+        }
+        .type-input { margin-top: 0.5rem; }
+        select.correct { border-color: var(--secondary); background: #ecfdf5; color: var(--secondary); font-weight: bold; }
+        select.incorrect { border-color: var(--danger); background: #fef2f2; }
+
+        /* --- Match Game --- */
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .match-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .match-card {
+            background: white; border: 2px solid #e2e8f0; padding: 1rem;
+            text-align: center; cursor: pointer; border-radius: 0.5rem; transition: all 0.2s; user-select: none;
+        }
+        .match-card.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .match-card.matched { background: #dcfce7; color: var(--secondary); border-color: var(--secondary); opacity: 0.6; pointer-events: none; }
+
+        /* --- Gap Fill & Scenario --- */
+        .fill-item { background: #f1f5f9; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 4px solid var(--primary); }
+
+        /* --- Spin Wheel --- */
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 10px solid #e2e8f0;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: conic-gradient(
+                #ef4444 0deg 60deg,
+                #f59e0b 60deg 120deg,
+                #10b981 120deg 180deg,
+                #3b82f6 180deg 240deg,
+                #8b5cf6 240deg 300deg,
+                #ec4899 300deg 360deg
+            );
+        }
+        .wheel-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 2;
+        }
+        .wheel-pointer {
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
+            border-top: 30px solid var(--text); z-index: 3;
+        }
+        .wheel-result {
+            text-align: center; margin-top: 1.5rem; padding: 1rem; background: #fffbeb;
+            border: 2px solid #fcd34d; border-radius: 0.5rem; min-height: 100px;
+        }
+        .big-word { font-size: 1.5rem; font-weight: bold; color: var(--primary); display: block; margin-bottom: 0.5rem; }
+
+
+        @media (max-width: 600px) {
+            .match-grid { grid-template-columns: 1fr; }
+            .vocab-table th:nth-child(3), .vocab-table td:nth-child(3) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Emotions Vocabulary</h1>
+        <div class="subtitle">Feelings, Reactions & States of Mind</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. Vocabulary List -->
+    <section>
+        <h2>📚 Vocabulary List</h2>
+        <div class="category-tabs">
+            <button class="tab-btn active" id="tab-positive" onclick="filterVocab('positive')">Positive</button>
+            <button class="tab-btn" id="tab-anger" onclick="filterVocab('anger')">Anger/Sadness</button>
+            <button class="tab-btn" id="tab-fear" onclick="filterVocab('fear')">Fear/Surprise</button>
+            <button class="tab-btn" id="tab-verbs" onclick="filterVocab('verbs')">Verbs</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="vocab-table">
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>Czech</th>
+                        <th>Definition / Example</th>
+                    </tr>
+                </thead>
+                <tbody id="vocab-body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 2. Scenario Drill (Replaces Visual Match) -->
+    <section>
+        <h2>🤔 Drill 1: How would you feel if...?</h2>
+        <p>Read the scenario and choose the most appropriate emotion.</p>
+        
+        <div class="fill-item">
+            1. You studied all night and got 100% on the big exam.<br>
+            <strong>I would feel...</strong>
+            <select class="scenario-select" data-ans="thrilled">
+                <option value="">Choose...</option>
+                <option value="miserable">Miserable</option>
+                <option value="thrilled">Thrilled</option>
+                <option value="furious">Furious</option>
+            </select>
+        </div>
+
+        <div class="fill-item">
+            2. You are walking home alone in the dark and hear a strange noise.<br>
+            <strong>I would feel...</strong>
+            <select class="scenario-select" data-ans="terrified">
+                <option value="">Choose...</option>
+                <option value="terrified">Terrified</option>
+                <option value="content">Content</option>
+                <option value="cheered up">Cheered up</option>
+            </select>
+        </div>
+
+        <div class="fill-item">
+            3. Your best friend is moving to Australia forever.<br>
+            <strong>I would feel...</strong>
+            <select class="scenario-select" data-ans="heartbroken">
+                <option value="">Choose...</option>
+                <option value="annoyed">Annoyed</option>
+                <option value="heartbroken">Heartbroken</option>
+                <option value="relieved">Relieved</option>
+            </select>
+        </div>
+
+        <div class="fill-item">
+            4. Your little brother broke your brand new phone.<br>
+            <strong>I would feel...</strong>
+            <select class="scenario-select" data-ans="furious">
+                <option value="">Choose...</option>
+                <option value="optimistic">Optimistic</option>
+                <option value="furious">Furious</option>
+                <option value="insecure">Insecure</option>
+            </select>
+        </div>
+
+        <div class="fill-item">
+            5. You have a job interview in 10 minutes.<br>
+            <strong>I would feel...</strong>
+            <select class="scenario-select" data-ans="anxious">
+                <option value="">Choose...</option>
+                <option value="anxious">Anxious</option>
+                <option value="bitter">Bitter</option>
+                <option value="delighted">Delighted</option>
+            </select>
+        </div>
+
+        <button class="btn btn-check" onclick="checkScenarios()">Check Scenarios</button>
+        <div id="scenario-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 3. Match Up Game -->
+    <section>
+        <h2>🧩 Drill 2: Meaning Match</h2>
+        <p>Match the English word to the Czech translation.</p>
+        <div class="match-grid">
+            <div class="match-col" id="col-eng"></div>
+            <div class="match-col" id="col-cz"></div>
+        </div>
+        <div id="match-feedback" class="feedback"></div>
+        <button class="btn btn-reset" style="background:transparent; color:#666; font-size:0.9rem; text-decoration:underline; margin-top:0;" onclick="initMatchGame()">Reset Game</button>
+    </section>
+
+    <!-- 4. Gap Fill -->
+    <section>
+        <h2>✍️ Drill 3: Complete the Sentence</h2>
+        <p>Select the correct word to complete the sentences.</p>
+        <div id="gap-container"></div>
+        <button class="btn btn-check" onclick="checkGapFill()">Check Answers</button>
+        <div id="gap-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 5. Typing Task -->
+    <section>
+        <h2>⌨️ Drill 4: Speed Typing</h2>
+        <p>Type the correct English word based on the clue.</p>
+        
+        <div class="fill-item">
+            <span style="color:var(--primary); font-weight:bold;">Def:</span> Extremely angry.<br>
+            <input type="text" class="type-input" data-ans="furious" placeholder="Type here...">
+        </div>
+        
+        <div class="fill-item">
+            <span style="color:var(--secondary); font-weight:bold;">Cz:</span> Spokojený<br>
+            <input type="text" class="type-input" data-ans="content" placeholder="Type here...">
+        </div>
+        
+        <div class="fill-item">
+             <span style="color:var(--primary); font-weight:bold;">Def:</span> Very surprised.<br>
+            <input type="text" class="type-input" data-ans="astonished" placeholder="Type here...">
+        </div>
+
+        <div class="fill-item">
+             <span style="color:var(--secondary); font-weight:bold;">Cz:</span> Přehlcený<br>
+            <input type="text" class="type-input" data-ans="overwhelmed" placeholder="Type here...">
+        </div>
+
+        <!-- NEW ITEMS ADDED -->
+        <div class="fill-item">
+             <span style="color:var(--primary); font-weight:bold;">Def:</span> Not confident about yourself.<br>
+            <input type="text" class="type-input" data-ans="insecure" placeholder="Type here...">
+        </div>
+
+        <div class="fill-item">
+             <span style="color:var(--secondary); font-weight:bold;">Cz:</span> Zklamaný<br>
+            <input type="text" class="type-input" data-ans="disappointed" placeholder="Type here...">
+        </div>
+
+        <div class="fill-item">
+             <span style="color:var(--primary); font-weight:bold;">Def:</span> To speak too proudly about yourself.<br>
+             <span style="font-size: 0.8em; color: #666;">(Verb: To _____)</span><br>
+            <input type="text" class="type-input" data-ans="boast" placeholder="Type here...">
+        </div>
+
+        <button class="btn btn-check" onclick="checkTyping()">Check Spelling</button>
+        <div id="type-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 6. Spin Wheel -->
+    <section>
+        <h2>🎰 Drill 5: Spin the Wheel</h2>
+        <p>Spin the wheel. Use the word you get in a perfect sentence!</p>
+        
+        <div style="position: relative; margin: 2rem 0;">
+            <div class="wheel-pointer"></div>
+            <div class="wheel-container" id="wheel"></div>
+            <div class="wheel-center" onclick="spinWheel()" style="cursor:pointer;">SPIN</div>
+        </div>
+
+        <div class="wheel-result" id="wheel-output">
+            Press SPIN to start!
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // --- DATA ---
+    const vocabData = [
+        // Positive
+        { cat: 'positive', word: 'Cheerful', cz: 'Veselý', def: 'Happy and positive.', ex: 'He is always so cheerful in the morning.' },
+        { cat: 'positive', word: 'Delighted', cz: 'Nadšený', def: 'Very pleased.', ex: 'I am delighted you passed your test.' },
+        { cat: 'positive', word: 'Content', cz: 'Spokojený', def: 'Peaceful and satisfied.', ex: 'I am perfectly content right now.' },
+        { cat: 'positive', word: 'Thrilled', cz: 'Unesený', def: 'Extremely excited.', ex: 'She was thrilled with the tickets.' },
+        { cat: 'positive', word: 'Optimistic', cz: 'Optimistický', def: 'Hopeful and confident.', ex: 'I am optimistic about my interview.' },
+        { cat: 'positive', word: 'Relieved', cz: 'Pociťující úlevu', def: 'Happy bad things didn\'t happen.', ex: 'I was relieved to find my wallet.' },
+
+        // Anger & Sadness
+        { cat: 'anger', word: 'Annoyed', cz: 'Podrážděný', def: 'Slightly angry.', ex: 'I am annoyed the bus is late.' },
+        { cat: 'anger', word: 'Furious', cz: 'Rozuřený', def: 'Extremely angry.', ex: 'My dad was furious about the car.' },
+        { cat: 'anger', word: 'Frustrated', cz: 'Frustrovaný', def: 'Annoyed you can\'t do something.', ex: 'I am frustrated with this math problem.' },
+        { cat: 'anger', word: 'Bitter', cz: 'Zatrpklý', def: 'Angry about the past.', ex: 'He is bitter about losing his job.' },
+        { cat: 'anger', word: 'Resentful', cz: 'Rozhořčený', def: 'Angry about unfairness.', ex: 'She felt resentful about working weekends.' },
+        { cat: 'anger', word: 'Miserable', cz: 'Nešťastný', def: 'Very unhappy.', ex: 'I feel absolutely miserable today.' },
+        { cat: 'anger', word: 'Heartbroken', cz: 'Zlomené srdce', def: 'Extremely sad.', ex: 'He was heartbroken when she left.' },
+        { cat: 'anger', word: 'Down in the dumps', cz: 'V depresi', def: 'Idiom: Feeling unhappy.', ex: 'You look a bit down in the dumps.' },
+        { cat: 'anger', word: 'Upset', cz: 'Rozrušený', def: 'Worried/Unhappy.', ex: 'Don\'t be upset about the mistake.' },
+        { cat: 'anger', word: 'Disappointed', cz: 'Zklamaný', def: 'Sad about failed expectations.', ex: 'I am disappointed the movie was boring.' },
+
+        // Fear & Surprise
+        { cat: 'fear', word: 'Anxious', cz: 'Úzkostlivý', def: 'Worried and nervous.', ex: 'I am anxious about the presentation.' },
+        { cat: 'fear', word: 'Terrified', cz: 'Vyděšený', def: 'Extremely frightened.', ex: 'I am terrified of spiders.' },
+        { cat: 'fear', word: 'Insecure', cz: 'Nejistý', def: 'Not confident.', ex: 'He feels insecure about his looks.' },
+        { cat: 'fear', word: 'Overwhelmed', cz: 'Přehlcený', def: 'Too much to deal with.', ex: 'I am overwhelmed with homework.' },
+        { cat: 'fear', word: 'Apprehensive', cz: 'Plný obav', def: 'Worried about future.', ex: 'I am apprehensive about moving.' },
+        { cat: 'fear', word: 'Puzzled', cz: 'Zmatený', def: 'Confused.', ex: 'The teacher looked puzzled.' },
+        { cat: 'fear', word: 'Astonished', cz: 'Užaslý', def: 'Very surprised.', ex: 'I was astonished by the change.' },
+        { cat: 'fear', word: 'Shocked', cz: 'Šokovaný', def: 'Surprised and upset.', ex: 'Everyone was shocked by the news.' },
+
+        // Verbs
+        { cat: 'verbs', word: 'To cheer up', cz: 'Rozveselit se', def: 'To become happier.', ex: 'I bought chocolate to cheer him up.' },
+        { cat: 'verbs', word: 'To calm down', cz: 'Uklidnit se', def: 'Stop being angry/excited.', ex: 'You need to calm down.' },
+        { cat: 'verbs', word: 'To freak out', cz: 'Šílet', def: 'Panic suddenly.', ex: 'Don\'t freak out about the keys.' },
+        { cat: 'verbs', word: 'To empathise', cz: 'Soucítit', def: 'Understand feelings.', ex: 'It is easy to empathise with him.' },
+        { cat: 'verbs', word: 'To suppress', cz: 'Potlačovat', def: 'Prevent expressing.', ex: 'He tried to suppress his anger.' },
+        { cat: 'verbs', word: 'To offend', cz: 'Urazit', def: 'Make someone upset.', ex: 'I didn\'t mean to offend you.' },
+        { cat: 'verbs', word: 'To cope with', cz: 'Vyrovnat se s', def: 'Deal successfully.', ex: 'How do you cope with stress?' },
+        { cat: 'verbs', word: 'To boast', cz: 'Chlubit se', def: 'Speak proudly.', ex: 'Nobody likes it when you boast.' }
+    ];
+
+    // --- 1. SCENARIO CHECK ---
+    function checkScenarios() {
+        let score = 0;
+        let total = 5;
+        document.querySelectorAll('.scenario-select').forEach(sel => {
+            if(sel.value === sel.dataset.ans) {
+                sel.className = 'scenario-select correct';
+                score++;
+            } else {
+                sel.className = 'scenario-select incorrect';
+            }
+        });
+        const fb = document.getElementById('scenario-feedback');
+        fb.textContent = `You got ${score}/${total} correct!`;
+        fb.className = score === total ? 'feedback success' : 'feedback error';
+        fb.style.display = 'block';
+    }
+
+    // --- 2. VOCAB TABLE ---
+    function filterVocab(category) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + category).classList.add('active');
+
+        const tbody = document.getElementById('vocab-body');
+        tbody.innerHTML = '';
+        
+        vocabData.filter(v => v.cat === category).forEach(v => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><strong>${v.word}</strong></td><td class="cz-word">${v.cz}</td><td>${v.def}<br><span class="ex-sentence">"${v.ex}"</span></td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- 3. MATCH GAME ---
+    let selectedEng = null;
+    
+    function initMatchGame() {
+        // Pick 8 random words
+        const gameItems = [...vocabData].sort(() => 0.5 - Math.random()).slice(0, 8);
+        const colEng = document.getElementById('col-eng');
+        const colCz = document.getElementById('col-cz');
+        document.getElementById('match-feedback').style.display = 'none';
+        
+        colEng.innerHTML = ''; colCz.innerHTML = '';
+
+        [...gameItems].sort(() => 0.5 - Math.random()).forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card'; el.textContent = item.word;
+            el.onclick = () => selectEng(el, item.word);
+            colEng.appendChild(el);
+        });
+
+        [...gameItems].sort(() => 0.5 - Math.random()).forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card'; el.textContent = item.cz;
+            el.dataset.match = item.word;
+            el.onclick = () => selectCz(el);
+            colCz.appendChild(el);
+        });
+    }
+
+    function selectEng(el, word) {
+        if(el.classList.contains('matched')) return;
+        document.querySelectorAll('#col-eng .match-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedEng = { el: el, word: word };
+    }
+
+    function selectCz(el) {
+        if(!selectedEng || el.classList.contains('matched')) return;
+        if(el.dataset.match === selectedEng.word) {
+            el.classList.add('matched');
+            selectedEng.el.classList.add('matched');
+            selectedEng.el.classList.remove('selected');
+            selectedEng = null;
+            if(document.querySelectorAll('#col-eng .match-card:not(.matched)').length === 0) {
+                const fb = document.getElementById('match-feedback');
+                fb.textContent = "Excellent Work!";
+                fb.className = "feedback success";
+                fb.style.display = 'block';
+            }
+        } else {
+            el.style.background = '#fee2e2';
+            setTimeout(() => el.style.background = 'white', 500);
+        }
+    }
+
+    // --- 4. GAP FILL ---
+    function initGapFill() {
+        const container = document.getElementById('gap-container');
+        // Pick 5 sentences
+        const items = [...vocabData].sort(() => 0.5 - Math.random()).slice(0, 5);
+        
+        items.forEach((item, idx) => {
+            const regex = new RegExp(item.word, 'gi');
+            const blankedEx = item.ex.replace(regex, '______');
+            const others = vocabData.filter(v => v.word !== item.word).sort(()=>0.5-Math.random()).slice(0,2).map(v=>v.word);
+            const options = [item.word, ...others].sort(()=>0.5-Math.random());
+            
+            const div = document.createElement('div');
+            div.className = 'fill-item';
+            
+            let optsHtml = `<select class="gap-select" data-ans="${item.word}"><option value="">---</option>`;
+            options.forEach(o => optsHtml += `<option value="${o}">${o}</option>`);
+            optsHtml += `</select>`;
+
+            div.innerHTML = `<strong>${idx+1}.</strong> ${blankedEx} <br> ${optsHtml}`;
+            container.appendChild(div);
+        });
+    }
+
+    function checkGapFill() {
+        let score = 0;
+        document.querySelectorAll('.gap-select').forEach(sel => {
+            if(sel.value === sel.dataset.ans) {
+                sel.className = 'gap-select correct'; score++;
+            } else {
+                sel.className = 'gap-select incorrect';
+            }
+        });
+        const fb = document.getElementById('gap-feedback');
+        fb.textContent = `You got ${score}/5`;
+        fb.className = score===5 ? 'feedback success' : 'feedback error';
+        fb.style.display = 'block';
+    }
+
+    // --- 5. TYPING TASK ---
+    function checkTyping() {
+        let score = 0;
+        let total = 7; // Updated total
+        document.querySelectorAll('.type-input').forEach(inp => {
+            if(inp.value.toLowerCase().trim() === inp.dataset.ans) {
+                inp.style.borderColor = "var(--secondary)";
+                inp.style.backgroundColor = "#ecfdf5";
+                score++;
+            } else {
+                inp.style.borderColor = "var(--danger)";
+                inp.style.backgroundColor = "#fef2f2";
+            }
+        });
+        const fb = document.getElementById('type-feedback');
+        fb.textContent = `You got ${score}/${total} correct!`;
+        fb.className = score === total ? 'feedback success' : 'feedback error';
+        fb.style.display = 'block';
+    }
+
+    // --- 6. SPIN WHEEL ---
+    function spinWheel() {
+        const wheel = document.getElementById('wheel');
+        const output = document.getElementById('wheel-output');
+        
+        const deg = 1080 + Math.floor(Math.random() * 360);
+        wheel.style.transform = `rotate(${deg}deg)`;
+        
+        const randomItem = vocabData[Math.floor(Math.random() * vocabData.length)];
+        
+        output.innerHTML = "Spinning...";
+        
+        setTimeout(() => {
+            output.innerHTML = `
+                <span class="big-word">${randomItem.word}</span>
+                Make a sentence about: <strong>${randomItem.def}</strong>
+            `;
+        }, 4000); // 4s matches CSS transition
+    }
+
+
+    // --- INIT ---
+    window.onload = function() {
+        filterVocab('positive');
+        initMatchGame();
+        initGapFill();
+    };
+
+</script>
+
+</body>
+</html>

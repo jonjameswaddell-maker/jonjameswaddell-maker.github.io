@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Shows: B1 Intermediate</title>
+    <style>
+        :root {
+            /* ESL Architect Palette */
+            --primary: #2563eb;       /* Deep Blue */
+            --primary-dark: #1d4ed8;
+            --secondary: #10B981;     /* Success Green */
+            --accent: #f59e0b;        /* Attention Orange */
+            --bg: #f8fafc;            /* Off-white background */
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 18px; /* Projector friendly */
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; letter-spacing: -0.025em; }
+        .subtitle { opacity: 0.9; font-weight: 300; margin-top: 0.5rem; font-size: 1.1rem; }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-top: 0;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* --- Components --- */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-check { background: var(--secondary); width: 100%; }
+        .btn-check:hover { background: #059669; }
+        .btn-reset { background: var(--text); margin-top: 2rem; }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .feedback.hidden { display: none; }
+        .feedback.success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+        .feedback.error { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+
+        /* --- Warm Up: Image Grid --- */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .image-card {
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            text-align: center;
+            background: #f1f5f9;
+        }
+        .image-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        .image-card select {
+            width: 90%;
+            margin: 0.5rem 0;
+            padding: 0.25rem;
+        }
+
+        /* --- Vocab: Match Columns --- */
+        .match-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .match-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .match-item {
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .match-item:hover { border-color: var(--primary); background: #eff6ff; }
+        .match-item.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .match-item.matched { background: var(--secondary); color: white; border-color: var(--secondary); opacity: 0.6; pointer-events: none; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+
+        /* --- Reading --- */
+        .text-passage {
+            background: #fffbeb;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border-left: 5px solid var(--accent);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        .question-block { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+        .options-row { display: flex; gap: 1rem; margin-top: 0.5rem; }
+        .option-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            cursor: pointer;
+            background: white;
+        }
+        .option-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .option-btn.correct { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .option-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+
+        /* --- Reading 2: Grid --- */
+        .desc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .desc-card {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        .desc-card select { width: 100%; margin-top: 0.5rem; padding: 0.5rem; }
+
+        /* --- Listening --- */
+        .audio-container {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        audio { width: 100%; max-width: 500px; }
+
+        /* --- Fun Task --- */
+        .creative-card {
+            background: white;
+            border: 2px dashed var(--primary);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+        }
+        .creative-form input, .creative-form select {
+            display: block;
+            width: 100%;
+            margin: 0.5rem 0 1rem;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+        }
+        #show-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #1e293b;
+            color: white;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        /* --- Game: Emoji Pictionary --- */
+        .game-area { text-align: center; }
+        .emoji-display { font-size: 4rem; margin-bottom: 1rem; }
+        .game-input { font-size: 1.2rem; padding: 0.5rem; text-align: center; width: 80%; }
+
+        @media (max-width: 600px) {
+            .match-area { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>TV Addicts</h1>
+        <div class="subtitle">B1 Intermediate | Vocabulary & Skills</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. WARM UP -->
+    <section>
+        <h2>🖼️ Warm Up: What's on TV?</h2>
+        <p>Look at the images. What type of TV show do they represent? Select the correct answer.</p>
+        <div class="image-grid" id="warmup-grid">
+            <!-- Injected by JS -->
+        </div>
+        <button class="btn btn-check" onclick="checkWarmup()">Check Warm Up</button>
+        <div id="warmup-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 2. VOCABULARY -->
+    <section>
+        <h2>📚 Vocabulary Match</h2>
+        <p>Tap an English word (Blue), then tap the correct Czech translation.</p>
+        <div class="match-area">
+            <div class="match-col" id="col-eng"></div>
+            <div class="match-col" id="col-cze"></div>
+        </div>
+        <div id="vocab-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 3. READING 1 -->
+    <section>
+        <h2>📖 Reading: The Golden Age</h2>
+        <div class="text-passage">
+            <p><strong>The Changing Face of TV</strong></p>
+            <p>Twenty years ago, families sat around the TV at 7:00 PM to watch the news or their favorite <strong>comedy series</strong>. If you missed it, you missed it! Today, things are very different. Streaming services like Netflix and Disney+ have changed our habits completely.</p>
+            <p>Now, we can "binge-watch" an entire season of a <strong>wildlife documentary</strong> or a <strong>crime drama</strong> in one weekend. We don't have to wait for the <strong>adverts</strong> to finish to make a cup of tea. However, some people think we have lost something. The shared experience of watching a huge <strong>sports</strong> event or a <strong>reality show</strong> finale live is becoming rare.</p>
+        </div>
+        
+        <div id="reading-quiz"></div>
+        <button class="btn btn-check" onclick="checkReading1()">Check Reading</button>
+        <div id="r1-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 4. READING 2 (Definitions) -->
+    <section>
+        <h2>🔍 What show is it?</h2>
+        <p>Read the description and choose the correct TV genre.</p>
+        <div class="desc-grid" id="desc-grid">
+            <!-- JS Injection -->
+        </div>
+        <button class="btn btn-check" onclick="checkReading2()">Check Answers</button>
+        <div id="r2-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 5. LISTENING -->
+    <section>
+        <h2>🎧 Listening Task</h2>
+        <div class="audio-container">
+            <p>Listen to Nick talking about his TV habits.</p>
+            <audio controls>
+                <!-- UPDATED: Points to local file 'nick-tv-dream.mp3' -->
+                <source src="nick-tv-dream.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+        
+        <div class="quiz-block">
+            <p><strong>1. What is Nick's favourite TV show?</strong></p>
+            <div class="options-row" id="l-q1">
+                <button class="option-btn" onclick="selectOption(this, 'l-q1')">Survivor</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q1')">The Last Frontier</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q1')">Masterchef</button>
+            </div>
+
+            <p><strong>2. What type of show is it?</strong></p>
+            <div class="options-row" id="l-q2">
+                <button class="option-btn" onclick="selectOption(this, 'l-q2')">Nature Documentary</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q2')">Reality Show</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q2')">News</button>
+            </div>
+
+            <p><strong>3. How often does he watch TV?</strong></p>
+            <div class="options-row" id="l-q3">
+                <button class="option-btn" onclick="selectOption(this, 'l-q3')">Every evening</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q3')">On weekends</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q3')">Never</button>
+            </div>
+
+            <p><strong>4. Does he prefer streaming or cinema?</strong></p>
+            <div class="options-row" id="l-q4">
+                <button class="option-btn" onclick="selectOption(this, 'l-q4')">Streaming</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q4')">Cinema</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q4')">Neither</button>
+            </div>
+
+            <p><strong>5. What is his dream job?</strong></p>
+            <div class="options-row" id="l-q5">
+                <button class="option-btn" onclick="selectOption(this, 'l-q5')">TV Producer</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q5')">Actor</button>
+                <button class="option-btn" onclick="selectOption(this, 'l-q5')">Cameraman</button>
+            </div>
+        </div>
+        <button class="btn btn-check" onclick="checkListening()">Check Listening</button>
+        <div id="l-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 6. FUN TASK -->
+    <section>
+        <h2>🎨 Creative: Pitch a New Show</h2>
+        <p>You are a TV Producer. Create a new hit show!</p>
+        <div class="creative-card">
+            <div class="creative-form">
+                <input type="text" id="show-name" placeholder="Name of your show...">
+                <select id="show-genre">
+                    <option value="Reality Show">Reality Show</option>
+                    <option value="Cooking Show">Cooking Show</option>
+                    <option value="Wildlife Documentary">Wildlife Documentary</option>
+                    <option value="Quiz Show">Quiz Show</option>
+                </select>
+                <input type="text" id="show-host" placeholder="Who is the host?">
+                <button class="btn" onclick="createShow()">Generate Poster</button>
+            </div>
+            <div id="show-result"></div>
+        </div>
+    </section>
+
+    <!-- 7. GAME -->
+    <section>
+        <h2>🎮 Game: Emoji Pictionary</h2>
+        <p>Guess the TV Genre from the emojis. (English only!)</p>
+        <div class="game-area">
+            <div class="emoji-display" id="emoji-display">🦁🌍🎥</div>
+            <input type="text" class="game-input" id="game-input" placeholder="Type answer here...">
+            <button class="btn" onclick="checkGame()">Guess</button>
+            <div id="game-feedback" class="feedback hidden"></div>
+            <button class="btn btn-reset" style="background:none; color:var(--primary); text-decoration:underline; border:none; margin:0;" onclick="nextGameLevel()">Skip / Next</button>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 2rem; color: #64748b; font-size: 0.9rem;">
+        Created for B1 English Learners | &copy; 2024 ESL Architect
+    </footer>
+
+</div>
+
+<script>
+    // --- DATA CONFIG ---
+    const genres = [
+        "Advert", "Cartoon", "Chat show", "Comedy series", "Cooking show", 
+        "Quiz show", "Reality show", "Sports", "The News", "Wildlife documentary"
+    ];
+
+    // --- 1. WARM UP LOGIC ---
+    const warmupImages = [
+        { url: "https://images.unsplash.com/photo-1575550959106-5a7defe28b56?auto=format&fit=crop&w=300&q=80", correct: "Wildlife documentary" },
+        // Replaced broken cooking image
+        { url: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=300&q=80", correct: "Cooking show" },
+        // Replaced broken sports image
+        { url: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=300&q=80", correct: "Sports" },
+        { url: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=300&q=80", correct: "The News" }
+    ];
+
+    function initWarmup() {
+        const grid = document.getElementById('warmup-grid');
+        warmupImages.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = 'image-card';
+            // Dropdown HTML
+            let options = `<option value="">Choose...</option>`;
+            genres.forEach(g => options += `<option value="${g}">${g}</option>`);
+            
+            div.innerHTML = `
+                <img src="${item.url}" alt="TV Genre">
+                <select id="w-sel-${idx}">${options}</select>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function checkWarmup() {
+        let score = 0;
+        warmupImages.forEach((item, idx) => {
+            const sel = document.getElementById(`w-sel-${idx}`);
+            if (sel.value === item.correct) {
+                score++;
+                sel.style.borderColor = 'var(--secondary)';
+                sel.style.background = '#ecfdf5';
+            } else {
+                sel.style.borderColor = 'var(--danger)';
+                sel.style.background = '#fef2f2';
+            }
+        });
+        const fb = document.getElementById('warmup-feedback');
+        fb.textContent = `You got ${score}/${warmupImages.length} correct!`;
+        fb.className = score === warmupImages.length ? 'feedback success' : 'feedback error';
+        fb.classList.remove('hidden');
+    }
+
+    // --- 2. VOCAB MATCHING LOGIC ---
+    const vocabData = [
+        { en: "Advert", cz: "Reklama" },
+        { en: "Cartoon", cz: "Kreslený film" },
+        { en: "Chat show", cz: "Talk show" },
+        { en: "Comedy series", cz: "Komediální seriál" },
+        { en: "Cooking show", cz: "Pořad o vaření" },
+        { en: "Quiz show", cz: "Soutěžní pořad" },
+        { en: "Reality show", cz: "Reality show" },
+        { en: "Sports", cz: "Sport" },
+        { en: "The news", cz: "Zprávy" },
+        { en: "Wildlife documentary", cz: "Přírodovědný dokument" }
+    ];
+
+    let selectedEn = null;
+    let selectedCz = null;
+    let matchesFound = 0;
+
+    function initVocab() {
+        const colEn = document.getElementById('col-eng');
+        const colCz = document.getElementById('col-cze');
+        
+        // Shuffle
+        const enList = [...vocabData].sort(() => Math.random() - 0.5);
+        const czList = [...vocabData].sort(() => Math.random() - 0.5);
+
+        enList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-item';
+            el.textContent = item.en;
+            el.onclick = () => handleVocabClick(el, item.en, 'en');
+            colEn.appendChild(el);
+        });
+
+        czList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-item';
+            el.textContent = item.cz;
+            el.onclick = () => handleVocabClick(el, item.en, 'cz'); // Store English key for checking
+            colCz.appendChild(el);
+        });
+    }
+
+    function handleVocabClick(el, key, type) {
+        if (el.classList.contains('matched')) return;
+
+        // Deselect previous of same type
+        if (type === 'en') {
+            if (selectedEn) selectedEn.el.classList.remove('selected');
+            selectedEn = { el, key };
+            el.classList.add('selected');
+        } else {
+            if (selectedCz) selectedCz.el.classList.remove('selected');
+            selectedCz = { el, key };
+            el.classList.add('selected');
+        }
+
+        // Check match
+        if (selectedEn && selectedCz) {
+            if (selectedEn.key === selectedCz.key) {
+                // Match!
+                selectedEn.el.classList.add('matched');
+                selectedCz.el.classList.add('matched');
+                selectedEn.el.classList.remove('selected');
+                selectedCz.el.classList.remove('selected');
+                selectedEn = null;
+                selectedCz = null;
+                matchesFound++;
+                if (matchesFound === vocabData.length) {
+                    const fb = document.getElementById('vocab-feedback');
+                    fb.textContent = "Excellent work! All words matched.";
+                    fb.className = "feedback success";
+                    fb.classList.remove('hidden');
+                }
+            } else {
+                // Wrong
+                selectedEn.el.classList.add('shake');
+                selectedCz.el.classList.add('shake');
+                setTimeout(() => {
+                    selectedEn.el.classList.remove('shake', 'selected');
+                    selectedCz.el.classList.remove('shake', 'selected');
+                    selectedEn = null;
+                    selectedCz = null;
+                }, 500);
+            }
+        }
+    }
+
+    // --- 3. READING 1 LOGIC ---
+    const reading1Questions = [
+        { q: "What did families do 20 years ago?", options: ["Watched TV together", "Watched YouTube", "Played games"], a: "Watched TV together" },
+        { q: "What is 'binge-watching'?", options: ["Watching one episode", "Watching many episodes at once", "Not watching TV"], a: "Watching many episodes at once" },
+        { q: "What is an advantage of streaming?", options: ["More adverts", "No adverts", "It is free"], a: "No adverts" },
+        { q: "What do we miss now?", options: ["Coffee", "Shared live experiences", "The news"], a: "Shared live experiences" },
+        { q: "Which genre is mentioned as a 'season' we can watch?", options: ["The news", "Crime drama", "Adverts"], a: "Crime drama" },
+        { q: "What type of show finale is mentioned?", options: ["Reality show", "Cooking show", "Cartoon"], a: "Reality show" }
+    ];
+
+    function initReading1() {
+        const container = document.getElementById('reading-quiz');
+        reading1Questions.forEach((item, idx) => {
+            let html = `<div class="question-block" id="rq-${idx}"><p><strong>${idx+1}. ${item.q}</strong></p><div class="options-row">`;
+            item.options.forEach(opt => {
+                html += `<button class="option-btn" onclick="selectOption(this, 'rq-${idx}')">${opt}</button>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    function selectOption(btn, parentId) {
+        const parent = document.getElementById(parentId);
+        const btns = parent.getElementsByClassName('option-btn');
+        Array.from(btns).forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+
+    function checkReading1() {
+        let score = 0;
+        reading1Questions.forEach((item, idx) => {
+            const parent = document.getElementById(`rq-${idx}`);
+            const selected = parent.querySelector('.selected');
+            const btns = parent.getElementsByClassName('option-btn');
+            
+            // Clear styles
+            Array.from(btns).forEach(b => b.classList.remove('correct', 'wrong'));
+
+            if (selected) {
+                if (selected.textContent === item.a) {
+                    score++;
+                    selected.classList.add('correct');
+                } else {
+                    selected.classList.add('wrong');
+                    // Show correct
+                    Array.from(btns).forEach(b => { if(b.textContent === item.a) b.classList.add('correct'); });
+                }
+            }
+        });
+        const fb = document.getElementById('r1-feedback');
+        fb.textContent = `You scored ${score}/${reading1Questions.length}`;
+        fb.className = score >= 4 ? "feedback success" : "feedback error";
+        fb.classList.remove('hidden');
+    }
+
+    // --- 4. READING 2 LOGIC ---
+    const reading2Data = [
+        { text: "Two teams answer difficult questions to win money.", a: "Quiz show" },
+        { text: "A famous chef teaches you how to make spaghetti.", a: "Cooking show" },
+        { text: "We watch a group of people living in a house together.", a: "Reality show" },
+        { text: "Funny animated characters like Mickey Mouse or Simpson.", a: "Cartoon" },
+        { text: "A report about what happened in the world today.", a: "The News" },
+        { text: "Short video to sell you a new car or shampoo.", a: "Advert" }
+    ];
+
+    function initReading2() {
+        const grid = document.getElementById('desc-grid');
+        reading2Data.forEach((item, idx) => {
+            let options = `<option value="">Select Genre...</option>`;
+            genres.forEach(g => options += `<option value="${g}">${g}</option>`);
+
+            const card = document.createElement('div');
+            card.className = 'desc-card';
+            card.innerHTML = `
+                <p><em>"${item.text}"</em></p>
+                <select id="r2-sel-${idx}">${options}</select>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function checkReading2() {
+        let score = 0;
+        reading2Data.forEach((item, idx) => {
+            const sel = document.getElementById(`r2-sel-${idx}`);
+            if (sel.value === item.a) {
+                score++;
+                sel.style.background = '#d1fae5';
+            } else {
+                sel.style.background = '#fee2e2';
+            }
+        });
+        const fb = document.getElementById('r2-feedback');
+        fb.textContent = `You scored ${score}/${reading2Data.length}`;
+        fb.className = score === reading2Data.length ? "feedback success" : "feedback error";
+        fb.classList.remove('hidden');
+    }
+
+    // --- 5. LISTENING LOGIC ---
+    function checkListening() {
+        const a1 = document.querySelector('#l-q1 .selected')?.textContent;
+        const a2 = document.querySelector('#l-q2 .selected')?.textContent;
+        const a3 = document.querySelector('#l-q3 .selected')?.textContent;
+        const a4 = document.querySelector('#l-q4 .selected')?.textContent;
+        const a5 = document.querySelector('#l-q5 .selected')?.textContent;
+
+        const correct = ["The Last Frontier", "Nature Documentary", "Every evening", "Streaming", "TV Producer"];
+        let score = 0;
+
+        [a1, a2, a3, a4, a5].forEach((ans, i) => {
+            if (ans === correct[i]) score++;
+        });
+
+        // Show correct answers visually
+        if (a1 !== correct[0]) highlightCorrect('#l-q1', correct[0]);
+        if (a2 !== correct[1]) highlightCorrect('#l-q2', correct[1]);
+        if (a3 !== correct[2]) highlightCorrect('#l-q3', correct[2]);
+        if (a4 !== correct[3]) highlightCorrect('#l-q4', correct[3]);
+        if (a5 !== correct[4]) highlightCorrect('#l-q5', correct[4]);
+
+        const fb = document.getElementById('l-feedback');
+        fb.textContent = `You got ${score}/5 correct.`;
+        fb.className = score === 5 ? "feedback success" : "feedback error";
+        fb.classList.remove('hidden');
+    }
+
+    function highlightCorrect(parentId, correctText) {
+        const parent = document.querySelector(parentId);
+        const btns = parent.querySelectorAll('.option-btn');
+        btns.forEach(b => {
+            if (b.textContent === correctText) b.classList.add('correct');
+            else if (b.classList.contains('selected')) b.classList.add('wrong');
+        });
+    }
+
+    // --- 6. FUN TASK ---
+    function createShow() {
+        const name = document.getElementById('show-name').value;
+        const genre = document.getElementById('show-genre').value;
+        const host = document.getElementById('show-host').value;
+        const result = document.getElementById('show-result');
+
+        if (!name || !host) {
+            alert("Please fill in all fields!");
+            return;
+        }
+
+        // Random gradient for the "Poster" look
+        const gradients = [
+            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            "linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)",
+            "linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)",
+            "linear-gradient(to right, #4facfe 0%, #00f2fe 100%)"
+        ];
+        const randomBg = gradients[Math.floor(Math.random() * gradients.length)];
+        const textColor = randomBg.includes('#ff9a9e') || randomBg.includes('#84fab0') ? '#1f2937' : 'white';
+
+        result.style.display = 'block';
+        // Applied dynamic background to simulate a generated poster
+        result.style.background = randomBg;
+        result.style.color = textColor;
+        
+        result.innerHTML = `
+            <div style="border: 4px solid ${textColor}; padding: 1rem; border-radius: 0.5rem;">
+                <h3 style="font-size: 1.2rem; margin: 0; opacity: 0.9; letter-spacing: 2px;">COMING SOON</h3>
+                <h2 style="font-size: 3rem; margin: 10px 0; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">${name}</h2>
+                <p style="font-size: 1.2rem;">The world's most exciting <strong>${genre}</strong>!</p>
+                <hr style="border-color: ${textColor}; opacity: 0.5; width: 50%;">
+                <p>Hosted by the legendary<br><strong style="font-size: 1.5rem;">${host}</strong></p>
+                <p style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.8;">Only on Channel 5</p>
+            </div>
+        `;
+    }
+
+    // --- 7. GAME ---
+    const gameLevels = [
+        { emojis: "🦁🌿🐘", a: "wildlife documentary" },
+        { emojis: "🍳👨‍🍳🥗", a: "cooking show" },
+        { emojis: "🎤📰🌍", a: "the news" },
+        { emojis: "😂🎭🤣", a: "comedy series" },
+        { emojis: "⚽🥅🏆", a: "sports" }
+    ];
+    let currentGame = 0;
+
+    function initGame() {
+        document.getElementById('emoji-display').textContent = gameLevels[currentGame].emojis;
+    }
+
+    function checkGame() {
+        const input = document.getElementById('game-input');
+        const fb = document.getElementById('game-feedback');
+        if (input.value.toLowerCase().trim() === gameLevels[currentGame].a) {
+            fb.textContent = "Correct! Next level...";
+            fb.className = "feedback success";
+            fb.classList.remove('hidden');
+            setTimeout(nextGameLevel, 1500);
+        } else {
+            fb.textContent = "Try again!";
+            fb.className = "feedback error";
+            fb.classList.remove('hidden');
+        }
+    }
+
+    function nextGameLevel() {
+        currentGame = (currentGame + 1) % gameLevels.length;
+        document.getElementById('game-input').value = "";
+        document.getElementById('game-feedback').classList.add('hidden');
+        initGame();
+    }
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+        initWarmup();
+        initVocab();
+        initReading1();
+        initReading2();
+        initGame();
+    };
+
+</script>
+
+</body>
+</html>

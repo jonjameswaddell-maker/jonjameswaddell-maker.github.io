@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Up: Past Simple Irregulars</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338ca;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --bg: #F3F4F6;
+            --text: #1F2937;
+            --card-bg: #ffffff;
+            --danger: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 18px; /* Larger for projectors */
+        }
+
+        /* Layout & Containers */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; }
+        h2 { color: var(--primary); margin-top: 0; }
+        .subtitle { opacity: 0.9; font-weight: 300; }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        section:hover {
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Utilities */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .btn:hover { background: var(--primary-dark); }
+        .btn-check { background: var(--secondary); width: 100%; margin-top: 1rem; }
+        .btn-reset { background: var(--text); margin-left: 10px; }
+
+        .hidden { display: none; }
+        .feedback { margin-top: 1rem; font-weight: bold; padding: 0.5rem; border-radius: 0.5rem; }
+        .feedback.success { background: #d1fae5; color: #065f46; }
+        .feedback.error { background: #fee2e2; color: #991b1b; }
+
+        /* Warm Up */
+        .discussion-cards {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .discussion-card {
+            flex: 1 1 300px;
+            background: #eef2ff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border-left: 5px solid var(--primary);
+        }
+
+        /* Vocab Grid */
+        .verb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .verb-item {
+            background: #f8fafc;
+            padding: 0.5rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+        }
+
+        /* Matching Game */
+        .match-game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .match-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .match-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .match-card:hover { border-color: var(--primary); }
+        .match-card.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .match-card.matched { background: var(--secondary); color: white; border-color: var(--secondary); opacity: 0.5; pointer-events: none; }
+
+        /* Reading & Gap Fills */
+        .text-passage {
+            line-height: 2;
+            font-size: 1.1rem;
+            background: #fffbeb;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #fcd34d;
+        }
+        select, input[type="text"] {
+            padding: 0.25rem 0.5rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            background: white;
+        }
+        select.correct, input.correct { border-color: var(--secondary); background: #ecfdf5; }
+        select.incorrect, input.incorrect { border-color: var(--danger); background: #fef2f2; }
+
+        /* Comprehension Quiz */
+        .quiz-question {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .options-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .quiz-option {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
+        .quiz-option:hover { background: #f9fafb; }
+        .quiz-option.selected { border-color: var(--primary); background: #eef2ff; color: var(--primary); font-weight: bold; }
+        .quiz-option.correct { border-color: var(--secondary); background: var(--secondary); color: white; }
+        .quiz-option.wrong { border-color: var(--danger); background: var(--danger); color: white; }
+
+        /* Listening */
+        .listening-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Tic Tac Toe */
+        .ttt-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .ttt-cell {
+            aspect-ratio: 1;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+            padding: 5px;
+        }
+        .ttt-cell.taken-x { background: #EF4444; } /* Player X Red */
+        .ttt-cell.taken-o { background: #10B981; } /* Player O Green */
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .match-game-area { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8rem; }
+            section { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Past Tense Heroes</h1>
+        <div class="subtitle">B1 Intermediate | Irregular Verbs Masterclass</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. Warm Up -->
+    <section>
+        <h2>🔥 Warm Up</h2>
+        <p>Turn to your partner and discuss these questions. You have 3 minutes!</p>
+        <div class="discussion-cards">
+            <div class="discussion-card">
+                <strong>1.</strong> What was the most interesting thing you <em>did</em> last weekend?
+            </div>
+            <div class="discussion-card">
+                <strong>2.</strong> Where did you <em>go</em> on your last summer holiday?
+            </div>
+            <div class="discussion-card">
+                <strong>3.</strong> What was the last expensive thing you <em>bought</em>?
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Explanation & List -->
+    <section>
+        <h2>📚 The Rules (and the Breakers)</h2>
+        <p>Remember: Regular verbs end in <strong>-ed</strong> (walk &rarr; walked). <br>
+        <strong>Irregular verbs</strong> change completely. You just have to memorize them!</p>
+        
+        <div style="background: #e0e7ff; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <strong>Example:</strong> I <em>buy</em> a coffee every day. (Present) &rarr; I <em>bought</em> a coffee yesterday. (Past)
+        </div>
+
+        <h3>The 15 Key Verbs</h3>
+        <div class="verb-grid" id="verbListDisplay">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <!-- 3. Vocabulary Game -->
+    <section>
+        <h2>🧩 Match Up Challenge</h2>
+        <p>Tap a blue card (Present), then tap the matching orange card (Past).</p>
+        <div class="match-game-area">
+            <div class="match-column" id="col-present"></div>
+            <div class="match-column" id="col-past"></div>
+        </div>
+        <div id="match-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 4. Reading Task -->
+    <section>
+        <h2>📖 Reading: The Worst Birthday</h2>
+        <p>Read the story. Select the correct Past Simple verb from the dropdown menu.</p>
+        
+        <div class="text-passage">
+            It was my 16th birthday last Saturday, but it was a disaster! First, I <select id="r1"><option value="">___</option><option value="wake">wake</option><option value="woke">woke</option><option value="waked">waked</option></select> up late because my alarm didn't go off. I ran to the kitchen and <select id="r2"><option value="">___</option><option value="make">make</option><option value="maked">maked</option><option value="made">made</option></select> some toast, but I burned it! 
+            <br><br>
+            Then, I <select id="r3"><option value="">___</option><option value="go">go</option><option value="went">went</option><option value="goed">goed</option></select> to meet my friends at the park. I <select id="r4"><option value="">___</option><option value="think">think</option><option value="thought">thought</option><option value="thank">thank</option></select> they had a surprise for me, but nobody was there. I waited for an hour! 
+            <br><br>
+            Finally, I <select id="r5"><option value="">___</option><option value="see">see</option><option value="saw">saw</option><option value="seed">seed</option></select> them hiding behind a tree. They <select id="r6"><option value="">___</option><option value="give">give</option><option value="gived">gived</option><option value="gave">gave</option></select> me a huge cake, but I dropped it!
+        </div>
+        <button class="btn btn-check" onclick="checkReading()">Check Answers</button>
+        <div id="reading-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 5. Comprehension Quiz -->
+    <section>
+        <h2>🧠 Quick Quiz</h2>
+        <p>Choose the correct verb form to complete these sentences.</p>
+        <div id="quiz-container">
+            <!-- Questions injected by JS -->
+        </div>
+        <button class="btn btn-check" onclick="checkQuiz()">Submit Quiz</button>
+        <div id="quiz-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 6. Gap Fill Challenge -->
+    <section>
+        <h2>✍️ Typing Challenge</h2>
+        <p>Type the correct past tense form of the verb in brackets. (e.g., if it says [go], type <strong>went</strong>).</p>
+        <div class="text-passage">
+            Last year, we <input type="text" id="g1" data-answer="flew"> [fly] to Japan. It was amazing. We <input type="text" id="g2" data-answer="ate"> [eat] sushi every single day. I <input type="text" id="g3" data-answer="bought"> [buy] a cool kimono for my sister. We also <input type="text" id="g4" data-answer="took"> [take] the bullet train to Kyoto. I <input type="text" id="g5" data-answer="drank"> [drink] so much green tea!
+        </div>
+        <button class="btn btn-check" onclick="checkGapFill()">Check Spelling</button>
+        <div id="gap-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 7. Listening Task -->
+    <section>
+        <h2>🎧 Listening: "The Crazy Party"</h2>
+        <p>Listen to the clip. Which verbs do you hear? Tick the boxes correctly.</p>
+        
+        <audio controls style="width: 100%; margin-bottom: 1rem;">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+
+        <p><strong>Task:</strong> Tick the verbs you hear in the story (Simulated task).</p>
+        <div class="listening-grid">
+            <label class="check-item"><input type="checkbox" class="listen-check" value="ate"> Ate</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="sung"> Sung</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="danced"> Danced</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="bathed"> Bathed</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="laughed"> Laughed</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="fought"> Fought</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="said"> Said</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="paid"> Paid</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="laid"> Laid</label>
+            <label class="check-item"><input type="checkbox" class="listen-check" value="made"> Made</label>
+        </div>
+        <button class="btn btn-check" onclick="checkListening()">Check Listening</button>
+        <div id="listening-feedback" class="feedback hidden"></div>
+    </section>
+
+    <!-- 8. Paired Game -->
+    <section>
+        <h2>🎮 Pair Game: Verb Tic-Tac-Toe</h2>
+        <p><strong>Instructions:</strong> Get into pairs.</p>
+        <ol>
+            <li>Player 1 chooses a square. They must say the <strong>Past Tense</strong> of that verb out loud.</li>
+            <li>If correct (Partner checks!), click the square once for <span style="color: #EF4444; font-weight: bold;">Red</span>.</li>
+            <li>Player 2 chooses a square. Say the past tense. Click twice for <span style="color: #10B981; font-weight: bold;">Green</span>.</li>
+            <li>Get 3 in a row to win!</li>
+        </ol>
+        
+        <div class="ttt-board" id="tttBoard">
+            <!-- Generated by JS -->
+        </div>
+        <div style="text-align: center;">
+            <button class="btn btn-reset" onclick="resetTTT()">Reset Board</button>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // --- DATA ---
+    const verbs = [
+        { base: "go", past: "went" },
+        { base: "see", past: "saw" },
+        { base: "eat", past: "ate" },
+        { base: "take", past: "took" },
+        { base: "give", past: "gave" },
+        { base: "write", past: "wrote" },
+        { base: "speak", past: "spoke" },
+        { base: "drive", past: "drove" },
+        { base: "drink", past: "drank" },
+        { base: "break", past: "broke" },
+        { base: "buy", past: "bought" },
+        { base: "think", past: "thought" },
+        { base: "catch", past: "caught" },
+        { base: "fly", past: "flew" },
+        { base: "wear", past: "wore" }
+    ];
+
+    // --- INITIALIZATION ---
+    window.onload = function() {
+        initVerbList();
+        initMatchGame();
+        initQuiz();
+        initTTT();
+    };
+
+    // --- 1. VERB LIST ---
+    function initVerbList() {
+        const container = document.getElementById('verbListDisplay');
+        verbs.forEach(v => {
+            const el = document.createElement('div');
+            el.className = 'verb-item';
+            el.innerHTML = `<strong>${v.base}</strong> &rarr; ${v.past}`;
+            container.appendChild(el);
+        });
+    }
+
+    // --- 2. MATCHING GAME ---
+    let selectedBase = null;
+    let selectedEl = null;
+
+    function initMatchGame() {
+        // Select 8 random verbs for the game to keep it simple
+        const gameVerbs = [...verbs].sort(() => 0.5 - Math.random()).slice(0, 8);
+        
+        const colPresent = document.getElementById('col-present');
+        const colPast = document.getElementById('col-past');
+        
+        const presentList = [...gameVerbs].sort(() => 0.5 - Math.random());
+        const pastList = [...gameVerbs].sort(() => 0.5 - Math.random());
+
+        presentList.forEach(v => {
+            const el = document.createElement('div');
+            el.className = 'match-card';
+            el.textContent = v.base;
+            el.dataset.type = 'base';
+            el.dataset.val = v.base;
+            el.onclick = () => handleMatchClick(el, v.base, 'base');
+            colPresent.appendChild(el);
+        });
+
+        pastList.forEach(v => {
+            const el = document.createElement('div');
+            el.className = 'match-card';
+            el.textContent = v.past;
+            el.dataset.type = 'past';
+            el.dataset.match = v.base; // Store base for checking
+            el.onclick = () => handleMatchClick(el, v.base, 'past'); // Pass base for easier logic
+            colPast.appendChild(el);
+        });
+    }
+
+    function handleMatchClick(el, val, type) {
+        if (el.classList.contains('matched')) return;
+
+        // Deselect if clicking same
+        if (selectedEl === el) {
+            el.classList.remove('selected');
+            selectedEl = null;
+            selectedBase = null;
+            return;
+        }
+
+        // First selection
+        if (!selectedEl) {
+            selectedEl = el;
+            selectedBase = val;
+            el.classList.add('selected');
+            return;
+        }
+
+        // Second selection (Check match)
+        // Must be different columns (types)
+        if (selectedEl.dataset.type === type) {
+            // Switched choice in same column
+            selectedEl.classList.remove('selected');
+            selectedEl = el;
+            selectedBase = val;
+            el.classList.add('selected');
+            return;
+        }
+
+        // Check Logic
+        // We need to find the base form associated with both
+        let match1 = selectedBase; 
+        let match2 = val;
+
+        // Simple check: The 'val' passed in init is 'base' for both columns logic for simplicity
+        // But let's verify logic:
+        // Present col passes v.base. Past col passes v.base. 
+        // So if match1 === match2, it's a match.
+        
+        if (match1 === match2) {
+            // Correct
+            el.classList.add('matched');
+            selectedEl.classList.add('matched');
+            selectedEl.classList.remove('selected'); // Remove selected style
+            
+            selectedEl = null;
+            selectedBase = null;
+            
+            // Check win
+            const remaining = document.querySelectorAll('.match-card:not(.matched)');
+            if(remaining.length === 0) {
+                const fb = document.getElementById('match-feedback');
+                fb.textContent = "Awesome! All matched!";
+                fb.className = "feedback success";
+                fb.classList.remove('hidden');
+            }
+        } else {
+            // Wrong
+            el.classList.add('shake');
+            selectedEl.classList.add('shake');
+            setTimeout(() => {
+                el.classList.remove('shake');
+                selectedEl.classList.remove('shake');
+                el.classList.remove('selected');
+                selectedEl.classList.remove('selected');
+                selectedEl = null;
+                selectedBase = null;
+            }, 500);
+        }
+    }
+
+    // --- 3. READING CHECK ---
+    function checkReading() {
+        const answers = { r1: 'woke', r2: 'made', r3: 'went', r4: 'thought', r5: 'saw', r6: 'gave' };
+        let score = 0;
+        let total = 6;
+
+        for (let id in answers) {
+            const el = document.getElementById(id);
+            if (el.value === answers[id]) {
+                el.className = 'correct';
+                score++;
+            } else {
+                el.className = 'incorrect';
+            }
+        }
+        
+        const fb = document.getElementById('reading-feedback');
+        fb.classList.remove('hidden');
+        if (score === total) {
+            fb.textContent = `Perfect! ${score}/${total}`;
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = `You got ${score}/${total}. Try again!`;
+            fb.className = "feedback error";
+        }
+    }
+
+    // --- 4. COMPREHENSION QUIZ ---
+    const quizData = [
+        { q: "Yesterday, I ___ a new car.", options: ["buy", "bought", "buyed"], a: "bought" },
+        { q: "She ___ too much soda at the party.", options: ["drink", "drank", "drunk"], a: "drank" },
+        { q: "We ___ a great movie last night.", options: ["saw", "seed", "see"], a: "saw" },
+        { q: "He ___ his homework on the bus.", options: ["do", "did", "done"], a: "did" },
+        { q: "I ___ you my phone number!", options: ["gave", "give", "gived"], a: "gave" },
+        { q: "They ___ to Spain last summer.", options: ["flewed", "fly", "flew"], a: "flew" },
+        { q: "The teacher ___ very quickly.", options: ["speak", "spoke", "speaked"], a: "spoke" },
+        { q: "Who ___ the window?", options: ["break", "broke", "braked"], a: "broke" }
+    ];
+
+    function initQuiz() {
+        const container = document.getElementById('quiz-container');
+        quizData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'quiz-question';
+            div.innerHTML = `<p><strong>${index + 1}.</strong> ${item.q}</p>`;
+            
+            const group = document.createElement('div');
+            group.className = 'options-group';
+            
+            item.options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option';
+                btn.textContent = opt;
+                btn.onclick = () => selectOption(btn, group, opt);
+                group.appendChild(btn);
+            });
+            
+            div.appendChild(group);
+            container.appendChild(div);
+        });
+    }
+
+    function selectOption(btn, group, val) {
+        // Clear siblings
+        Array.from(group.children).forEach(c => c.classList.remove('selected'));
+        btn.classList.add('selected');
+        group.dataset.value = val;
+    }
+
+    function checkQuiz() {
+        const groups = document.querySelectorAll('.options-group');
+        let score = 0;
+        
+        groups.forEach((group, idx) => {
+            const selected = group.dataset.value;
+            const correct = quizData[idx].a;
+            
+            // Visual feedback on options
+            Array.from(group.children).forEach(btn => {
+                btn.classList.remove('correct', 'wrong');
+                if (btn.textContent === correct) {
+                    if (selected === correct || btn.classList.contains('selected')) {
+                         // Highlight correct if selected or just show answer?
+                         // Let's highlight correct always
+                    }
+                }
+            });
+
+            const selectedBtn = Array.from(group.children).find(b => b.classList.contains('selected'));
+            
+            if (selected === correct) {
+                score++;
+                if (selectedBtn) selectedBtn.classList.add('correct');
+            } else {
+                if (selectedBtn) selectedBtn.classList.add('wrong');
+                // Highlight real answer
+                const correctBtn = Array.from(group.children).find(b => b.textContent === correct);
+                if (correctBtn) correctBtn.classList.add('correct');
+            }
+        });
+
+        const fb = document.getElementById('quiz-feedback');
+        fb.classList.remove('hidden');
+        if (score === quizData.length) {
+            fb.textContent = `Amazing! ${score}/${quizData.length}`;
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = `You got ${score}/${quizData.length}. Check the green boxes for correct answers.`;
+            fb.className = "feedback error";
+        }
+    }
+
+    // --- 5. GAP FILL ---
+    function checkGapFill() {
+        let score = 0;
+        let total = 5;
+        for (let i = 1; i <= total; i++) {
+            const input = document.getElementById(`g${i}`);
+            const answer = input.dataset.answer;
+            if (input.value.trim().toLowerCase() === answer) {
+                input.className = 'correct';
+                score++;
+            } else {
+                input.className = 'incorrect';
+            }
+        }
+        const fb = document.getElementById('gap-feedback');
+        fb.classList.remove('hidden');
+        fb.textContent = `You got ${score}/${total} correct.`;
+        fb.className = score === total ? "feedback success" : "feedback error";
+    }
+
+    // --- 6. LISTENING ---
+    function checkListening() {
+        const correctVerbs = ["ate", "danced", "laughed", "fought", "said", "paid"]; // Based on prompt yes/no
+        const allChecks = document.querySelectorAll('.listen-check');
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        allChecks.forEach(chk => {
+            const val = chk.value;
+            const parent = chk.parentElement;
+            
+            // Reset style
+            parent.style.background = 'white';
+
+            if (chk.checked) {
+                if (correctVerbs.includes(val)) {
+                    parent.style.background = '#d1fae5'; // Green
+                    correctCount++;
+                } else {
+                    parent.style.background = '#fee2e2'; // Red
+                    wrongCount++;
+                }
+            } else {
+                // If wasn't checked but should have been
+                if (correctVerbs.includes(val)) {
+                    // Maybe highlight border? Keep it simple for now.
+                }
+            }
+        });
+
+        const fb = document.getElementById('listening-feedback');
+        fb.classList.remove('hidden');
+        
+        // Simple scoring logic
+        if (correctCount === correctVerbs.length && wrongCount === 0) {
+            fb.textContent = "Perfect hearing!";
+            fb.className = "feedback success";
+        } else {
+            fb.textContent = `You found ${correctCount} verbs, but made ${wrongCount} mistakes.`;
+            fb.className = "feedback error";
+        }
+    }
+
+    // --- 7. TIC TAC TOE ---
+    function initTTT() {
+        const board = document.getElementById('tttBoard');
+        board.innerHTML = '';
+        const gameVerbs = [...verbs].sort(() => 0.5 - Math.random()).slice(0, 9);
+        
+        gameVerbs.forEach(v => {
+            const cell = document.createElement('div');
+            cell.className = 'ttt-cell';
+            cell.textContent = v.base; // Show Present
+            cell.dataset.state = '0'; // 0: empty, 1: X, 2: O
+            
+            cell.onclick = () => {
+                let state = parseInt(cell.dataset.state);
+                state = (state + 1) % 3;
+                cell.dataset.state = state;
+                
+                cell.classList.remove('taken-x', 'taken-o');
+                
+                if (state === 0) {
+                    cell.style.background = 'var(--primary)';
+                } else if (state === 1) {
+                    cell.classList.add('taken-x'); // Red
+                } else if (state === 2) {
+                    cell.classList.add('taken-o'); // Green
+                }
+            };
+            board.appendChild(cell);
+        });
+    }
+
+    function resetTTT() {
+        initTTT();
+    }
+
+</script>
+
+</body>
+</html>

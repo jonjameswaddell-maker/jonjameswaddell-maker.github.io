@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Household Chores </title>
+    <style>
+        :root {
+            --primary: #4F46E5; /* Indigo */
+            --primary-dark: #4338ca;
+            --secondary: #10B981; /* Emerald Green */
+            --accent: #F59E0B; /* Amber */
+            --bg: #F3F4F6; /* Cool Gray */
+            --text: #1F2937; /* Dark Gray */
+            --card-bg: #ffffff;
+            --danger: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 18px; /* Projector friendly */
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px; /* Slightly narrower for focus */
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 1rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; letter-spacing: -0.025em; }
+        h2 { color: var(--primary); margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; }
+        .subtitle { opacity: 0.9; font-weight: 300; margin-top: 0.5rem; }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        section:hover { transform: translateY(-2px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+
+        /* Buttons & Inputs */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-check { background: var(--secondary); width: 100%; margin-top: 1.5rem; }
+        .btn-reset { background: var(--text); margin-top: 1rem; }
+        
+        input[type="text"], select {
+            padding: 0.5rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background: white;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .correct { border-color: var(--secondary); background: #ecfdf5; color: var(--secondary); }
+        .incorrect { border-color: var(--danger); background: #fef2f2; }
+
+        /* Feedback Boxes */
+        .feedback { margin-top: 1rem; padding: 1rem; border-radius: 0.5rem; display: none; font-weight: bold; }
+        .feedback.show { display: block; animation: fadeIn 0.5s; }
+        .feedback.success { background: #d1fae5; color: #065f46; border-left: 5px solid var(--secondary); }
+        .feedback.error { background: #fee2e2; color: #991b1b; border-left: 5px solid var(--danger); }
+
+        /* Warm Up: Furniture Grid */
+        .img-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .img-card {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .img-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Changed to square to prevent zooming/cropping issues */
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Vocab Match (Click) */
+        .match-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .match-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .match-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .match-card:hover { border-color: var(--primary); background: #eef2ff; }
+        .match-card.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.02); }
+        .match-card.matched { background: var(--secondary); color: white; border-color: var(--secondary); opacity: 0.6; pointer-events: none; }
+
+        /* Drills & Reading */
+        .drill-item, .reading-q {
+            background: #f8fafc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary);
+        }
+        .text-passage {
+            background: #fffbeb;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            line-height: 1.8;
+            border: 1px solid #fcd34d;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Listening */
+        .audio-wrapper {
+            background: #1f2937;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        audio { width: 100%; outline: none; }
+        .mcq-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+        .mcq-label { display: block; margin: 0.5rem 0; cursor: pointer; }
+
+        /* Fun Task: Roulette */
+        .roulette-box {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1rem;
+        }
+        #roulette-result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1.5rem 0;
+            min-height: 3rem;
+        }
+
+        /* Game: Hangman */
+        .hangman-area { text-align: center; }
+        .word-display { font-size: 2rem; letter-spacing: 0.5rem; margin: 1.5rem 0; font-family: monospace; }
+        .keyboard { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+        .key {
+            width: 40px; height: 40px;
+            background: #e5e7eb; border: none; border-radius: 5px;
+            font-weight: bold; cursor: pointer;
+        }
+        .key:hover { background: #d1d5db; }
+        .key.used { opacity: 0.5; pointer-events: none; }
+        .key.correct { background: var(--secondary); color: white; }
+        .key.wrong { background: var(--danger); color: white; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) {
+            .match-area, .img-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Chores & Housework</h1>
+        <div class="subtitle">Level B1 Intermediate | Vocabulary & Skills</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 1. Warm Up -->
+    <section>
+        <h2>🔥 Warm Up: In the House</h2>
+        <p>Look at the pictures. Select the correct furniture item for each image.</p>
+        <div class="img-grid">
+            <!-- Items 1-3 -->
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80" alt="Furniture">
+                <select id="wu1">
+                    <option value="">Select...</option>
+                    <option value="sofa">Sofa</option>
+                    <option value="armchair">Armchair</option>
+                    <option value="bookshelf">Bookshelf</option>
+                </select>
+            </div>
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?auto=format&fit=crop&w=400&q=80" alt="Furniture">
+                <select id="wu2">
+                    <option value="">Select...</option>
+                    <option value="wardrobe">Wardrobe</option>
+                    <option value="desk">Desk</option>
+                    <option value="bunkbed">Bunk Bed</option>
+                </select>
+            </div>
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80" alt="Furniture">
+                <select id="wu3">
+                    <option value="">Select...</option>
+                    <option value="lamp">Lamp</option>
+                    <option value="microwave">Microwave</option>
+                    <option value="radiator">Radiator</option>
+                </select>
+            </div>
+            <!-- Items 4-6 -->
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1589834390005-5d4fb9bf3d32?auto=format&fit=crop&w=400&q=80" alt="Furniture">
+                <select id="wu4">
+                    <option value="">Select...</option>
+                    <option value="coffee table">Coffee Table</option>
+                    <option value="desk">Desk</option>
+                    <option value="cupboard">Cupboard</option>
+                </select>
+            </div>
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?auto=format&fit=crop&w=400&q=80" alt="Furniture">
+                <select id="wu5">
+                    <option value="">Select...</option>
+                    <option value="bookshelf">Bookshelf</option>
+                    <option value="drawer">Drawer</option>
+                    <option value="stairs">Stairs</option>
+                </select>
+            </div>
+            <div class="img-card">
+                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=400&q=80" alt="Furniture">
+                <select id="wu6">
+                    <option value="">Select...</option>
+                    <option value="armchair">Armchair</option>
+                    <option value="sofa">Sofa</option>
+                    <option value="bed">Bed</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-check" onclick="checkWarmUp()">Check Answers</button>
+        <div id="wu-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 2. Vocabulary Match -->
+    <section>
+        <h2>🧹 Vocabulary: English ↔ Czech</h2>
+        <p>Tap an English chore (Blue), then tap the correct Czech translation (White).</p>
+        <div class="match-area">
+            <div class="match-col" id="col-eng"></div>
+            <div class="match-col" id="col-cz"></div>
+        </div>
+        <div id="match-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 3. Vocabulary Drilling -->
+    <section>
+        <h2>✍️ Sentence Scramble</h2>
+        <p>Put the words in the correct order to form a sentence about chores.</p>
+        
+        <div class="drill-item">
+            <p>1. always / I / the / dishes / wash</p>
+            <input type="text" id="scr1" placeholder="Type sentence here...">
+        </div>
+        <div class="drill-item">
+            <p>2. trash / out / take / Please / the</p>
+            <input type="text" id="scr2" placeholder="Type sentence here...">
+        </div>
+        <div class="drill-item">
+            <p>3. hate / ironing / I / really</p>
+            <input type="text" id="scr3" placeholder="Type sentence here...">
+        </div>
+        <div class="drill-item">
+            <p>4. bed / make / your / Did / you / ?</p>
+            <input type="text" id="scr4" placeholder="Type sentence here...">
+        </div>
+        <div class="drill-item">
+            <p>5. clean / room / your / must / You</p>
+            <input type="text" id="scr5" placeholder="Type sentence here...">
+        </div>
+        <div class="drill-item">
+            <p>6. table / the / set / Can / you / ?</p>
+            <input type="text" id="scr6" placeholder="Type sentence here...">
+        </div>
+        <div class="drill-item">
+            <p>7. floor / mopping / likes / nobody / the</p>
+            <input type="text" id="scr7" placeholder="Type sentence here...">
+        </div>
+        <div class="drill-item">
+            <p>8. are / dirty / clothes / Where / the / ?</p>
+            <input type="text" id="scr8" placeholder="Type sentence here...">
+        </div>
+
+        <button class="btn btn-check" onclick="checkScramble()">Check Sentences</button>
+        <div id="scramble-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 4. Reading 1 -->
+    <section>
+        <h2>📖 Reading: The 15-Minute Rule</h2>
+        <div class="text-passage">
+            <p><strong>The 15-Minute Rule</strong></p>
+            <p>Many people hate cleaning their homes because it feels overwhelming. They wait until Saturday morning and spend four hours cleaning everything. This is exhausting!</p>
+            <p>However, there is a better way. It is called the "15-Minute Rule". The idea is simple: you set a timer for 15 minutes every evening. During this time, you do as much cleaning as you can. You might load the dishwasher, sweep the kitchen floor, or put away toys. When the timer stops, you stop!</p>
+            <p>This method keeps the house tidy without making you tired. It helps you build a habit. Psychologists say that doing a little bit every day reduces stress and makes your home a happier place.</p>
+        </div>
+        
+        <h3>Comprehension Check</h3>
+        <div class="reading-q">
+            <p>1. Why do many people hate cleaning?</p>
+            <select id="rc1">
+                <option value="">Choose...</option>
+                <option value="a">It is too expensive.</option>
+                <option value="b">It feels overwhelming.</option>
+                <option value="c">They don't have tools.</option>
+            </select>
+        </div>
+        <div class="reading-q">
+            <p>2. When do people usually do a "big clean"?</p>
+            <select id="rc2">
+                <option value="">Choose...</option>
+                <option value="a">Saturday morning</option>
+                <option value="b">Monday night</option>
+                <option value="c">Sunday evening</option>
+            </select>
+        </div>
+        <div class="reading-q">
+            <p>3. What do you need for the "15-Minute Rule"?</p>
+            <select id="rc3">
+                <option value="">Choose...</option>
+                <option value="a">A cleaner</option>
+                <option value="b">A timer</option>
+                <option value="c">A vacuum</option>
+            </select>
+        </div>
+        <div class="reading-q">
+            <p>4. What happens when the timer stops?</p>
+            <select id="rc4">
+                <option value="">Choose...</option>
+                <option value="a">You keep cleaning.</option>
+                <option value="b">You stop immediately.</option>
+                <option value="c">You take a break.</option>
+            </select>
+        </div>
+        <div class="reading-q">
+            <p>5. What is the main benefit of this method?</p>
+            <select id="rc5">
+                <option value="">Choose...</option>
+                <option value="a">It saves money.</option>
+                <option value="b">It reduces stress.</option>
+                <option value="c">It cleans deeper.</option>
+            </select>
+        </div>
+        <div class="reading-q">
+            <p>6. The text suggests that doing a little every day creates a...</p>
+            <select id="rc6">
+                <option value="">Choose...</option>
+                <option value="a">Habit</option>
+                <option value="b">Problem</option>
+                <option value="c">Mess</option>
+            </select>
+        </div>
+
+        <button class="btn btn-check" onclick="checkReading1()">Check Answers</button>
+        <div id="rc-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 5. Reading 2 (Definitions) -->
+    <section>
+        <h2>🧩 What's the Job?</h2>
+        <p>Read the description and choose the correct chore from the list.</p>
+        
+        <div class="drill-item">
+            <p>1. You use heat and steam to remove wrinkles from shirts and trousers.</p>
+            <select class="job-select" data-ans="ironing">
+                <option value="">---</option>
+                <option value="ironing">Ironing</option>
+                <option value="vacuuming">Vacuuming</option>
+                <option value="dusting">Dusting</option>
+            </select>
+        </div>
+
+        <div class="drill-item">
+            <p>2. You need a machine to suck up dust and dirt from the carpet.</p>
+            <select class="job-select" data-ans="vacuuming">
+                <option value="">---</option>
+                <option value="mowing">Mowing the lawn</option>
+                <option value="vacuuming">Vacuuming</option>
+                <option value="sweeping">Sweeping</option>
+            </select>
+        </div>
+
+        <div class="drill-item">
+            <p>3. You do this outside. You cut the green grass to make the garden look nice.</p>
+            <select class="job-select" data-ans="mowing">
+                <option value="">---</option>
+                <option value="mowing">Mowing the lawn</option>
+                <option value="weeding">Weeding</option>
+                <option value="watering">Watering plants</option>
+            </select>
+        </div>
+
+        <div class="drill-item">
+            <p>4. After eating dinner, the plates and forks are dirty. You must do this.</p>
+            <select class="job-select" data-ans="dishes">
+                <option value="">---</option>
+                <option value="cooking">Cooking</option>
+                <option value="dishes">Washing the dishes</option>
+                <option value="shopping">Shopping</option>
+            </select>
+        </div>
+
+        <div class="drill-item">
+            <p>5. You wipe surfaces like tables and shelves with a cloth to remove grey powder.</p>
+            <select class="job-select" data-ans="dusting">
+                <option value="">---</option>
+                <option value="dusting">Dusting</option>
+                <option value="polishing">Polishing</option>
+                <option value="mopping">Mopping</option>
+            </select>
+        </div>
+
+        <div class="drill-item">
+            <p>6. The bin is full and smells bad. You need to take the bag outside.</p>
+            <select class="job-select" data-ans="trash">
+                <option value="">---</option>
+                <option value="trash">Taking out the trash</option>
+                <option value="recycling">Recycling</option>
+                <option value="cleaning">Cleaning</option>
+            </select>
+        </div>
+
+        <button class="btn btn-check" onclick="checkReading2()">Check Definitions</button>
+        <div id="r2-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 6. Listening -->
+    <section>
+        <h2>🎧 Listening Task: David's Chores</h2>
+        <div class="audio-wrapper">
+            <audio controls>
+                <source src="david-chores.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+        <div class="mcq-item">
+            <strong>1. What is David's least favourite chore?</strong><br>
+            <label class="mcq-label"><input type="radio" name="l1" value="a"> Vacuuming</label>
+            <label class="mcq-label"><input type="radio" name="l1" value="b"> Scrubbing the toilet</label>
+            <label class="mcq-label"><input type="radio" name="l1" value="c"> Ironing</label>
+        </div>
+
+        <div class="mcq-item">
+            <strong>2. What is his favourite chore?</strong><br>
+            <label class="mcq-label"><input type="radio" name="l2" value="a"> Walking the dog</label>
+            <label class="mcq-label"><input type="radio" name="l2" value="b"> Washing the car</label>
+            <label class="mcq-label"><input type="radio" name="l2" value="c"> Cooking dinner</label>
+        </div>
+
+        <div class="mcq-item">
+            <strong>3. Why is he annoyed with his little sister?</strong><br>
+            <label class="mcq-label"><input type="radio" name="l3" value="a"> She is too loud.</label>
+            <label class="mcq-label"><input type="radio" name="l3" value="b"> She never empties the dishwasher.</label>
+            <label class="mcq-label"><input type="radio" name="l3" value="c"> She leaves clothes on the floor.</label>
+        </div>
+
+        <div class="mcq-item">
+            <strong>4. Why does David not mind doing chores?</strong><br>
+            <label class="mcq-label"><input type="radio" name="l4" value="a"> He gets paid money.</label>
+            <label class="mcq-label"><input type="radio" name="l4" value="b"> He likes a clean house.</label>
+            <label class="mcq-label"><input type="radio" name="l4" value="c"> He listens to podcasts while working.</label>
+        </div>
+
+        <button class="btn btn-check" onclick="checkListening()">Submit Answers</button>
+        <div id="listening-feedback" class="feedback"></div>
+    </section>
+
+    <!-- 7. Fun Task -->
+    <section>
+        <h2>🎲 Chore Roulette</h2>
+        <p>Don't know what to clean this weekend? Let fate decide! Spin the wheel for a chore and a crazy rule.</p>
+        
+        <div class="roulette-box">
+            <div id="roulette-result">❓ Press Spin!</div>
+            <button class="btn" style="background: white; color: var(--primary);" onclick="spinRoulette()">🎰 SPIN</button>
+        </div>
+    </section>
+
+    <!-- 8. Game -->
+    <section>
+        <h2>🎮 Mini-Game: Chore Hangman</h2>
+        <p>Guess the chore before you run out of lives! (6 Lives)</p>
+        
+        <div class="hangman-area">
+            <div id="hm-word" class="word-display">_ _ _ _ _</div>
+            <div style="margin-bottom: 1rem;">Lives: <span id="hm-lives" style="color: var(--danger); font-weight: bold;">6</span></div>
+            <div id="hm-keyboard" class="keyboard"></div>
+            <div id="hm-msg" style="margin-top: 1rem; font-weight: bold; min-height: 1.5rem;"></div>
+            <button class="btn btn-reset" onclick="initHangman()">New Word</button>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container" style="text-align: center; color: #666; padding: 2rem;">
+        <p>Great job today! Keep practicing.</p>
+    </div>
+</footer>
+
+<script>
+    // --- 1. Warm Up Logic ---
+    function checkWarmUp() {
+        const answers = {
+            wu1: 'sofa', wu2: 'wardrobe', wu3: 'lamp',
+            wu4: 'coffee table', wu5: 'bookshelf', wu6: 'armchair'
+        };
+        let score = 0, total = 6;
+        
+        for (let id in answers) {
+            const el = document.getElementById(id);
+            if (el.value === answers[id]) {
+                el.classList.add('correct');
+                el.classList.remove('incorrect');
+                score++;
+            } else {
+                el.classList.add('incorrect');
+                el.classList.remove('correct');
+            }
+        }
+        showFeedback('wu-feedback', score, total);
+    }
+
+    // --- 2. Vocab Match Logic ---
+    const vocabData = [
+        { eng: "Vacuuming", cz: "Vysávání" },
+        { eng: "Ironing", cz: "Žehlení" },
+        { eng: "Doing laundry", cz: "Praní prádla" },
+        { eng: "Mowing lawn", cz: "Sekání trávy" },
+        { eng: "Washing dishes", cz: "Mytí nádobí" },
+        { eng: "Dusting", cz: "Utírání prachu" },
+        { eng: "Taking out trash", cz: "Vynášení košů" },
+        { eng: "Sweeping", cz: "Zametání" }
+    ];
+
+    let selectedEng = null;
+
+    function initMatch() {
+        const colEng = document.getElementById('col-eng');
+        const colCz = document.getElementById('col-cz');
+        
+        // Shuffle
+        const engList = [...vocabData].sort(() => 0.5 - Math.random());
+        const czList = [...vocabData].sort(() => 0.5 - Math.random());
+
+        engList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card';
+            el.textContent = item.eng;
+            el.onclick = () => handleEngClick(el, item.eng);
+            colEng.appendChild(el);
+        });
+
+        czList.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'match-card';
+            el.textContent = item.cz;
+            el.onclick = () => handleCzClick(el, item.eng); // Pass English key to check match
+            colCz.appendChild(el);
+        });
+    }
+
+    function handleEngClick(el, val) {
+        if (el.classList.contains('matched')) return;
+        
+        // Deselect previous English
+        document.querySelectorAll('#col-eng .match-card').forEach(c => c.classList.remove('selected'));
+        
+        selectedEng = { el: el, val: val };
+        el.classList.add('selected');
+    }
+
+    function handleCzClick(el, matchVal) {
+        if (!selectedEng || el.classList.contains('matched')) return;
+
+        if (selectedEng.val === matchVal) {
+            // Match
+            el.classList.add('matched');
+            selectedEng.el.classList.add('matched');
+            selectedEng.el.classList.remove('selected');
+            selectedEng = null;
+            checkMatchWin();
+        } else {
+            // Wrong
+            el.style.background = '#fee2e2';
+            setTimeout(() => el.style.background = 'white', 500);
+        }
+    }
+
+    function checkMatchWin() {
+        const remaining = document.querySelectorAll('#col-eng .match-card:not(.matched)');
+        if (remaining.length === 0) {
+            const fb = document.getElementById('match-feedback');
+            fb.textContent = "Výborně! All matched correctly.";
+            fb.className = "feedback success show";
+        }
+    }
+
+    // --- 3. Scramble Logic ---
+    function checkScramble() {
+        const answers = [
+            "I always wash the dishes",
+            "Please take out the trash",
+            "I really hate ironing",
+            "Did you make your bed?",
+            "You must clean your room",
+            "Can you set the table?",
+            "Nobody likes mopping the floor",
+            "Where are the dirty clothes?"
+        ];
+        // Allow slight variations (case insensitive, no punctuation)
+        let score = 0;
+        let total = 8;
+        
+        for (let i = 0; i < total; i++) {
+            const el = document.getElementById(`scr${i+1}`);
+            // Remove punctuation for easier matching
+            const user = el.value.replace(/[^\w\s]/gi, '').toLowerCase().trim();
+            const correct = answers[i].replace(/[^\w\s]/gi, '').toLowerCase().trim();
+            
+            if (user === correct) {
+                el.classList.add('correct');
+                el.classList.remove('incorrect');
+                score++;
+            } else {
+                el.classList.add('incorrect');
+                el.classList.remove('correct');
+            }
+        }
+        showFeedback('scramble-feedback', score, total);
+    }
+
+    // --- 4. Reading 1 Logic ---
+    function checkReading1() {
+        const key = { rc1: 'b', rc2: 'a', rc3: 'b', rc4: 'b', rc5: 'b', rc6: 'a' };
+        let score = 0;
+        for (let id in key) {
+            const el = document.getElementById(id);
+            if (el.value === key[id]) {
+                el.classList.add('correct');
+                el.classList.remove('incorrect');
+                score++;
+            } else {
+                el.classList.add('incorrect');
+                el.classList.remove('correct');
+            }
+        }
+        showFeedback('rc-feedback', score, 6);
+    }
+
+    // --- 5. Reading 2 Logic ---
+    function checkReading2() {
+        let score = 0;
+        const selects = document.querySelectorAll('.job-select');
+        selects.forEach(sel => {
+            if (sel.value === sel.dataset.ans) {
+                sel.classList.add('correct');
+                sel.classList.remove('incorrect');
+                score++;
+            } else {
+                sel.classList.add('incorrect');
+                sel.classList.remove('correct');
+            }
+        });
+        showFeedback('r2-feedback', score, 6);
+    }
+
+    // --- 6. Listening Logic ---
+    function checkListening() {
+        const answers = { l1: 'b', l2: 'a', l3: 'b', l4: 'c' };
+        let score = 0;
+        let total = 4;
+
+        for (let name in answers) {
+            const options = document.getElementsByName(name);
+            let userVal = null;
+            options.forEach(opt => {
+                if (opt.checked) userVal = opt.value;
+            });
+
+            // Find container to color
+            const container = options[0].closest('.mcq-item');
+            
+            if (userVal === answers[name]) {
+                score++;
+                container.style.borderLeft = "4px solid #10B981";
+                container.style.background = "#ecfdf5";
+            } else {
+                container.style.borderLeft = "4px solid #EF4444";
+                container.style.background = "#fef2f2";
+            }
+        }
+        
+        showFeedback('listening-feedback', score, total);
+    }
+
+    // --- 7. Roulette Logic ---
+    const chores = ["Vacuum", "Mop", "Dishes", "Dust", "Laundry", "Clean Windows"];
+    const conditions = [
+        "while dancing to disco music.",
+        "using only your left hand.",
+        "while singing Opera.",
+        "in your pajamas.",
+        "within 5 minutes!",
+        "while whistling."
+    ];
+
+    function spinRoulette() {
+        const disp = document.getElementById('roulette-result');
+        let count = 0;
+        const interval = setInterval(() => {
+            disp.textContent = chores[Math.floor(Math.random() * chores.length)];
+            count++;
+            if (count > 10) {
+                clearInterval(interval);
+                const chore = chores[Math.floor(Math.random() * chores.length)];
+                const cond = conditions[Math.floor(Math.random() * conditions.length)];
+                disp.innerHTML = `<span style="color:#FCD34D">${chore}</span> ${cond}`;
+            }
+        }, 100);
+    }
+
+    // --- 8. Hangman Logic ---
+    const hmWords = ["VACUUM", "LAUNDRY", "DISHWASHER", "IRONING", "SWEEPING", "DUSTPAN"];
+    let currentWord = "";
+    let guessed = [];
+    let lives = 6;
+
+    function initHangman() {
+        currentWord = hmWords[Math.floor(Math.random() * hmWords.length)];
+        guessed = [];
+        lives = 6;
+        document.getElementById('hm-msg').textContent = "";
+        updateHangmanUI();
+        createKeyboard();
+    }
+
+    function createKeyboard() {
+        const kb = document.getElementById('hm-keyboard');
+        kb.innerHTML = '';
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(letter => {
+            const btn = document.createElement('button');
+            btn.className = 'key';
+            btn.textContent = letter;
+            btn.onclick = () => handleGuess(letter, btn);
+            kb.appendChild(btn);
+        });
+    }
+
+    function handleGuess(letter, btn) {
+        if (lives <= 0 || guessed.includes(letter)) return;
+        
+        guessed.push(letter);
+        btn.classList.add('used');
+
+        if (currentWord.includes(letter)) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            lives--;
+        }
+        updateHangmanUI();
+        checkGameStatus();
+    }
+
+    function updateHangmanUI() {
+        document.getElementById('hm-lives').textContent = lives;
+        const display = currentWord.split('').map(char => guessed.includes(char) ? char : "_").join(' ');
+        document.getElementById('hm-word').textContent = display;
+    }
+
+    function checkGameStatus() {
+        if (!document.getElementById('hm-word').textContent.includes("_")) {
+            document.getElementById('hm-msg').textContent = "🎉 YOU WIN! 🎉";
+            document.getElementById('hm-msg').style.color = "var(--secondary)";
+        } else if (lives <= 0) {
+            document.getElementById('hm-msg').textContent = `💀 GAME OVER. Word was: ${currentWord}`;
+            document.getElementById('hm-msg').style.color = "var(--danger)";
+        }
+    }
+
+    // --- Utility ---
+    function showFeedback(id, score, total) {
+        const el = document.getElementById(id);
+        el.className = score === total ? "feedback success show" : "feedback error show";
+        el.textContent = score === total ? `Perfect! ${score}/${total}` : `You got ${score}/${total}. Try again!`;
+    }
+
+    // Init
+    window.onload = function() {
+        initMatch();
+        initHangman();
+    };
+
+</script>
+
+</body>
+</html>
